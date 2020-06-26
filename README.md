@@ -13,4 +13,4 @@ Intern hosts:
 
 Design document: go/im-step-capstone-design
 
-Design review presentation link:
+Design review presentation link: go/im-step-capstone-presentation
