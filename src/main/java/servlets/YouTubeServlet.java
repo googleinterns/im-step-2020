@@ -19,6 +19,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.io.File;  // Import the File class
+import java.io.FileWriter;
+import java.io.FileNotFoundException;  // Import this class to handle errors
+import java.util.Scanner; // Import the Scanner class to read text files
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
@@ -29,7 +34,6 @@ import com.google.gson.Gson;
 public class YouTubeServlet extends HttpServlet{
     // Need Dev-Key to make an authorized search.
     // For example: ... DEVELOPER_KEY = "YOUR ACTUAL KEY";
-    private static final String DEVELOPER_KEY = "AIzaSyD938GXrKFmO-z9VH49UJ7o04Z82iHJ8Rw";
 
     private static final String APPLICATION_NAME = "YouTube Data Retrieval";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
@@ -49,6 +53,18 @@ public class YouTubeServlet extends HttpServlet{
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+      String DEVELOPER_KEY = "";
+      try {
+        File myFile = new File("yt-key.txt");
+        Scanner myReader = new Scanner(myFile);
+        while (myReader.hasNextLine()) {
+          DEVELOPER_KEY = myReader.nextLine();
+        }
+        myReader.close();
+      } catch (FileNotFoundException e) {
+        response.setContentType("text/html");
+        response.getWriter().println("Error: " + e);
+      }
       try {
         YouTube youtubeService = getService();
         long num = 1;
@@ -73,9 +89,12 @@ public class YouTubeServlet extends HttpServlet{
         response.getWriter().println(directUrl);
       }
       catch (GeneralSecurityException e) {
-
+        response.setContentType("text/html;");
+        response.getWriter().println("Task Failed: Error Occurred");
+        response.setContentType("text/html;");
+        response.getWriter().println();
+        response.getWriter().println(e);
       }
-
     }
 
     /*
