@@ -115,7 +115,7 @@ public class AuthorizationServlet extends HttpServlet {
         return;
       }
 
-      LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+      HashMap<String, String> params = new HashMap<String, String>();
 
       params.put("code", code);
       params.put("client_id", GOOGLE_CLIENT_ID);
