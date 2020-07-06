@@ -1,2 +1,5 @@
 target/
+secret.txt
+yt-key.txt
+.vscode
 .idea
