@@ -1,4 +1,6 @@
 src/main/java/servlets/
-yt-key.txt
 target/
+yt-key.txt
+secret.txt
+.vscode
 .idea
