@@ -100,7 +100,7 @@ public class AuthorizationServlet extends HttpServlet {
     // error=access_denied&state=session%3Dpotatoes
 
     if (req.getParameter("error") != null) {
-      System.out.println("We have recieved the error!");
+      System.out.println("We have received the error!");
       resp.setContentType("text/html");
       resp.getWriter().println("Something went wrong when we tried to get permission, please retry!");
       return;
