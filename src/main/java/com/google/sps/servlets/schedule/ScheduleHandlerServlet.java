@@ -36,11 +36,6 @@ import java.util.List;
 @WebServlet("/schedule-handler")
 public final class ScheduleHandlerServlet extends HttpServlet {
 
-  /** We want to GRAB all calendar ID's. */
-  @Override
-  public void init() {
-  }
-
   /** Read through all filters */
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
