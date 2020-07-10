@@ -38,12 +38,6 @@ public class HTTP {
   public String post(String url, Map<String, String> formParameters) throws ClientProtocolException, IOException {
     HttpPost request = new HttpPost(url);
 
-    if (accessTokenReceived) {
-      System.out.println("Recieved! <=======>");
-      request.setHeader("Accept", "application/json");
-      request.setHeader("Content-type", "application/json");
-    }
-
     List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 
     for (String key : formParameters.keySet()) {

@@ -3,7 +3,7 @@ package com.google.sps.servlets;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;  // Import the File class
 import java.io.FileNotFoundException;  // Import this class to handle errors
-import java.util.Scanner; // Import the Scanner class to read text files
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.InputStream;
@@ -116,7 +115,7 @@ public class AuthorizationServlet extends HttpServlet {
         return;
       }
 
-      LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+      HashMap<String, String> params = new HashMap<String, String>();
 
       params.put("code", code);
       params.put("client_id", GOOGLE_CLIENT_ID);
