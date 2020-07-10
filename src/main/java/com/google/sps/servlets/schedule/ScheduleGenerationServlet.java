@@ -78,10 +78,7 @@ public class ScheduleGenerationServlet extends HttpServlet {
     String id = (String) calendar.get("id");
     request.getSession().setAttribute("study-schedule-id", id);
 
-    //////////////////////// 4) Call Fixer | ALTER BY USER SETTING: just delete event / find next available time / force move to next day /
-    // the fixer should be given a list of days and then perform user action
-
-		httpClient.getConnectionManager().shutdown();
+    httpClient.getConnectionManager().shutdown();
    
     response.sendRedirect("/"); 
   }
