@@ -63,6 +63,8 @@ public final class ScheduleHandlerServlet extends HttpServlet {
   }
 
   /** Read through all filters and SET THEM in User Preferences.java */
+
+
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws IOException {

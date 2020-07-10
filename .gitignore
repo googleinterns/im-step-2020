@@ -1,4 +1,5 @@
-src/main/java/servlets/
+src/main/java/com/google/sps/servlets/resources/
+yt-key.txt
 target/
 yt-key.txt
 secret.txt

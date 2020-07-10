@@ -47,10 +47,10 @@ public class AuthorizationServlet extends HttpServlet {
         // https://8080-4271c707-a3a3-471c-bf8f-7ccb224d6188.us-central1.cloudshell.dev/authorize
 
 
-  private static String GOOGLE_CLIENT_ID = "";
-  private static String GOOGLE_CLIENT_SECRET = "";
-  private static String GOOGLE_REDIRECT_URL = "";
-  private static HTTP http = new HTTP();
+  private String GOOGLE_CLIENT_ID = "";
+  private String GOOGLE_CLIENT_SECRET = "";
+  private String GOOGLE_REDIRECT_URL = "";
+  private HTTP http = new HTTP();
 
   public void init() {
     ArrayList<String> secret = new ArrayList<String>();
@@ -100,7 +100,7 @@ public class AuthorizationServlet extends HttpServlet {
     // error=access_denied&state=session%3Dpotatoes
 
     if (req.getParameter("error") != null) {
-      System.out.println("We have recieved the error!");
+      System.out.println("We have received the error!");
       resp.setContentType("text/html");
       resp.getWriter().println("Something went wrong when we tried to get permission, please retry!");
       return;
