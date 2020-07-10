@@ -16,26 +16,61 @@ var clicked = false;
 
 function getVideoResults() {
   var i;
-  if (clicked == false) {
+  let directUrls = []
+  if (!clicked) {
       fetch('/videoResults').then(response => response.json()).then((data) => {
       const dataListElement = document.getElementById('videoResults');
       dataListElement.innerHTML = '';
       console.log(dataListElement.innerHTML);
       if (dataListElement.innerHTML == '') {
         for (i=0; i<data.length; i++) {
-          dataListElement.appendChild(
-            createIFrame(data[i]));
+          if (i % 2 == 0) {
+            console.log("Embed", data[i]);
+            // Send embedded links to iframes on index.html
+            dataListElement.appendChild(
+              createIFrame(data[i]));
+          }
+          else {
+            console.log("Direct", data[i]);
+            // Add direct URLs to an array
+            directUrls.push(data[i]);
+          }
         }
       }
     });
+    sendURLsToEvents(directUrls);
   }
   clicked = true;
 }
 
+async function sendURLsToEvents(urls) {
+  // Send direct URL array to Payton's Servlet
+  try {
+    const response = await fetch('/schedule-handler', {
+       method:'POST', 
+       headers: {
+         'Content-Type': 'application/json',
+         'Accept': 'application/json'
+        },
+       body: JSON.stringify(urls)
+    });
+    // Make or Break on if it works
+    const data = await response.json();
+    if (data === true) {
+      // Success
+      console.log("Direct URLs sent to Payton's Servlet");
+    }
+  }
+  catch (e) {
+    // Log some errors
+    console.log("fetch failed: ", e);
+  }
+}
+
 function createIFrame(text) {
-  const liElement = document.createElement('iframe');
-  liElement.src = text;
-  return liElement;
+  const iFrameElement = document.createElement('iframe');
+  iFrameElement.src = text;
+  return iFrameElement;
 }
 
 function displayCalendar() {
