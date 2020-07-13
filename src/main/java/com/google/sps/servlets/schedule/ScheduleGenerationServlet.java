@@ -61,6 +61,8 @@ import org.joda.time.DateTime;
 public class ScheduleGenerationServlet extends HttpServlet {
 
   private static HTTP http = new HTTP();
+  private Time TIME = new Time();
+  private UserPreferences USER = new UserPreferences();
 
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -77,6 +79,45 @@ public class ScheduleGenerationServlet extends HttpServlet {
     JSONObject calendar = createNewCalendar(httpClient, accessToken, "Study Schedule");
     String id = (String) calendar.get("id");
     request.getSession().setAttribute("study-schedule-id", id);
+
+    ////////////////////////// 2) Create Events on Calendar
+
+    List<String> resource = (List<String>) request.getSession(false).getAttribute("resources"); // TODO: get from data store
+    System.out.println(resource);
+
+    // Grab timezone to be used with creation of event.
+    JSONObject timeZoneSetting = getSetting(accessToken, "timezone");
+    String timezone = (String) timeZoneSetting.get("value");
+    TIME.setTimeZoneId(timezone);
+
+    // Let's try to create events! We depend on RECURRING EVENTS. So, upto the next week, we try to create 
+    Integer successfulEventsCreated = 0;
+    for (int i = 0; i < 7; i++) {
+      if (successfulEventsCreated == UserPreferences.USER_EVENTS_CHOICE) break;
+
+      // Get resources
+      String res = "";
+      try {
+        res = resource.get(i);
+      } catch(Exception e) {
+        res = USER.DESCRIPTION;
+      }
+
+      // We can grab all of our resources here
+      // Add calendar ids to check:
+      List<String> ids = new ArrayList<String>();
+      ids.add("primary");
+      ids.add("c_q6hmddtul80v9e0js2e6df5dk8@group.calendar.google.com");
+      ids.add("google.com_3bfa816keojpcmrh9ou2fa0vp4@group.calendar.google.com");
+      ids.add(id);
+      List<DateTime> times = getStartInformationForPossibleEvent(httpClient, accessToken, i , timezone, ids);
+      if (!times.isEmpty()) {
+
+        JSONObject event = createNewEvent(httpClient, accessToken, timezone, id, 0, times.get(0), times.get(1), "Study Session", res, 4);
+
+        ++successfulEventsCreated;
+      } 
+    }
 
     //////////////////////// 4) Call Fixer | ALTER BY USER SETTING: just delete event / find next available time / force move to next day /
     // the fixer should be given a list of days and then perform user action
@@ -98,4 +139,189 @@ public class ScheduleGenerationServlet extends HttpServlet {
     return http.postWithData(httpClient, postRequest, json);
   } 
 
+  JSONObject createNewEvent(DefaultHttpClient httpClient, String accessToken, String timeZone, String id, int daysUntilStart, DateTime startTime, DateTime endTime, 
+  String summary, String description, int recurrenceLengthInWeeks) {
+    
+    // 1) Set start date and end date for recurrence
+    int dayOfWeek = startTime.getDayOfWeek();
+
+    // 2) Add event fields: Summary, Description, StartTime, EndTime, Recurrence
+    NewEvent event = new NewEvent(summary, description);
+
+    // Get zone ID since Java must be told the time zone.
+    ZoneId z = ZoneId.of( timeZone ) ; 
+
+    DateTimeFormatter fmt = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
+            .withZone(z);
+
+    // Set event START TIME and END TIME
+    event.setStart(fmt.format(startTime.toDate().toInstant()), timeZone);
+    event.setEnd(fmt.format(endTime.toDate().toInstant()), timeZone);
+
+    // Add a recurrence to this event that: repeats on THE DAYS GIVEN until X week(s) from now
+    event.addRecurrence(TIME.createWeekRecurrence(TIME.onDays(dayOfWeek), TIME.addWeeks(startTime.toDate(), recurrenceLengthInWeeks)));
+
+    // 3) Make request
+    Gson gson = new Gson();
+    String json = gson.toJson(event);
+
+    HttpPost postRequest = new HttpPost(event.createNewEventURL(id, accessToken));
+    return http.postWithData(httpClient, postRequest, json);
+  }
+
+  JSONObject getSetting(String accessToken, String setting) {
+    // 1) Grab timezone of user's Google Calendar
+    GetSetting getSetting = new GetSetting();
+    String json = "";
+    try {
+      json = http.get(getSetting.createGetSettingURL(setting, accessToken));
+    } catch (Exception e) {
+      System.out.println("There was an error getting the setting: " + e);
+    }
+    return http.parseJSON(json);
+  }
+
+  JSONObject getFreeBusy(DefaultHttpClient httpClient, String accessToken, String timeMin, String timeMax, String timeZone, List<String> ids) {
+    GetFreeBusy busy =  new GetFreeBusy(timeMin, timeMax, timeZone);
+
+    for (String id : ids) {
+      busy.addId(id);
+    }
+    busy.updateCalendarExpansionTo(ids.size());
+
+    HttpPost postRequest = new HttpPost(busy.createGetFreeBusyURL(accessToken));
+
+    Gson gson = new Gson();
+    String json = gson.toJson(busy);
+
+    return http.postWithData(httpClient, postRequest, json);
+  }
+
+
+  // ----------------- // Utility Event Functions // --------------------- //
+  // NOTE: timeMin and timeMax will be used in freeBusy span time. startDate is used for the date to try. These HAVE TO MATCH UP!
+  public List<DateTime> getStartInformationForPossibleEvent(DefaultHttpClient httpClient, String accessToken, Integer currentDate, String timeZone, List<String> ids ) {
+    // Get length of current date
+    String dayStart = TIME.setTime(0, currentDate, 0, 0);
+    String dayEnd = TIME.setTime(0, currentDate, 23, 59);
+    
+    JSONObject jsonObject = getFreeBusy(httpClient, accessToken, dayStart, dayEnd, timeZone, ids);
+
+    // Set default preferences
+    USER.applyStudySessionStartTimes();
+    USER.applyDurationStartTimes();
+
+    // Go through nested response
+    JSONObject calendar = (JSONObject) jsonObject.get("calendars");
+    JSONObject primary = (JSONObject) calendar.get("primary");
+    JSONArray array = (JSONArray) primary.get("busy");
+
+    for (String id : ids) {
+      if (id == ids.get(0)) continue; // So we don't add our primary ID twice!
+      System.out.println("Adding: " + id + " to our array");
+      try {
+        JSONObject cal = (JSONObject) calendar.get(id);
+        JSONArray busyTime = (JSONArray) cal.get("busy");
+        array.addAll(busyTime);
+      } catch (Exception e) {
+        System.out.println("An exception occurred!" + e);
+        continue;
+      }
+    }
+
+    // What are we trying to do?
+    // We trying to determine if a time period is valid. So we loop through each time period and it's duration and check it against each busy period.
+    // After it's been checked against every busy period and we haven't continued, then it's valid!
+    DateTime timeToTry = new DateTime().withZone(DateTimeZone.forID(TIME.timezone)).plusDays(currentDate);
+    DateTime timeToTryEnd = null;
+
+    List<DateTime> listOfValidTimes = new ArrayList<DateTime>();
+
+      // Loop through specific study session start times and see if one works.
+      for (Map.Entry<Integer,Integer> time : USER.STUDY_SESSION_START_TIME.entrySet()) {
+        timeToTry = timeToTry.withZone(DateTimeZone.forID(TIME.timezone)).withHourOfDay(time.getKey()).withMinuteOfHour(time.getValue()).withSecondOfMinute(0);
+        System.out.println(timeToTry);
+
+        // Check that we have not already gone past the time we are trying to schedule!
+        if (new DateTime().isAfter(timeToTry)) continue;
+
+        // Start with the max duration
+        for (Map.Entry<Integer,Integer> entry : USER.STUDY_SESSION_LENGTH.entrySet())  {
+          Boolean foundOverlap = false;
+          // Get duration of starttime
+          timeToTryEnd = timeToTry.plusHours(entry.getKey()).plusMinutes(entry.getValue());
+          Interval studySession = new Interval(timeToTry, timeToTryEnd);
+
+          Iterator i = array.iterator();
+
+          // Loop through busy periods and check if our duration could fit at any point.
+          while (i.hasNext()) {
+            // Grab each start and end time.
+            JSONObject busyTimePeriod = (JSONObject) i.next();
+            String busyStartTime = (String) busyTimePeriod.get("start");
+            String busyEndTime = (String) busyTimePeriod.get("end");
+
+            DateTime startBusy = DateTime.parse(busyStartTime).withZone(DateTimeZone.forID(TIME.timezone));
+            DateTime endBusy = DateTime.parse(busyEndTime).withZone(DateTimeZone.forID(TIME.timezone));
+
+            // Create an interval
+            Interval busyInterval = new Interval(startBusy, endBusy);
+
+            // If study session ever overlaps with any of the busy overlaps WITH ANY busy interval we can no longer set that as an event!
+            if (busyInterval.overlaps(studySession)) {
+              System.out.println("OVERLAPS: Busy Interval:  " + busyInterval + " ==================  Study Session: " + studySession);
+              foundOverlap = true;
+              break;
+            } else {
+              System.out.println("NONE: Busy Interval:  " + busyInterval + " ==================  Study Session: " + studySession);
+            }
+          }
+
+          // Study session with duraion FOUND. FUTURE: We could just add to the list here
+          if (!foundOverlap) {
+            // TODO(paytondennis@) Check ratio here coming soon; SOON
+            // Check ratio of next 4 weeks. Need to call freebusy for that time
+            listOfValidTimes.add(timeToTry);
+            listOfValidTimes.add(timeToTryEnd);
+            return listOfValidTimes;
+          }
+      }
+    }
+    
+    return listOfValidTimes;
+  }
+
+  /* Walkthrough:
+  // this function will: move to date. init use freebusy to try and find the 
+  // we are looking for an 80% ratio of the user being free. If 4 events, at least 3 should not be busy
+  // we are using freebusy because it automatically tells us, you are busy HERE
+
+
+
+
+  We're creating a LIGHT schedule so the max events we will set is 3
+  Variables: MAX_EVENTS_LIGHT = 3 weekly events for light | RATIO_FOR_FREE_BUSY = 80%. We can set that recurring event at that time if the ratio is 80% or above
+
+  // Read from UserPreferences.java to set variables
+  // 1) Just within week try to find the best time for a recurring event, (We should stop at MAX_EVENTS_LIGHT if successfully created OR if we check every day).
+
+    // Go 1 by 1 each day in the next day, call FreeBusy on the day we are currently looking at. --> it gives us back times when the user is busy during that day
+    // we receive those times and then try to see if there's enough time for preset DURATION_MAX all the way to DURATION_MIN at SPECIFIC POINTS (eg. 9am/9:30am). 
+    
+    // 2) IF we have found a possible POINT and DURATION that works for the week. We will check the following weeks if this possible time beats the ratio, if it does
+      // We give back the user a List<Integer> (for now) START HOUR, START MIN,LENGTH HOURS, LENGTH IN MINUTES (specific points) and (DURATION_MIN) 
+
+
+                                                        
+      |--------|         |------------|        |----|
+
+
+  */
+
+  // ALTER BY USER SETTING: just delete event / find next available time / force move to next day / leave_as_is
+  // the fixer should be given a list of days and then perform user action specified for events.
+  public void SchedulerFixer() {
+      
+  }
 }
