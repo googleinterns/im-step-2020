@@ -95,7 +95,6 @@ function getCalendarAttributes() {
         console.log("hello???????????????");
 
     });
-
 }
 
 // Main function handling Calendar display
