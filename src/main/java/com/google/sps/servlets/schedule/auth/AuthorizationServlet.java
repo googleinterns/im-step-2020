@@ -64,6 +64,9 @@ public class AuthorizationServlet extends HttpServlet {
       GOOGLE_CLIENT_ID = secret.get(0);
       GOOGLE_CLIENT_SECRET = secret.get(1);
       GOOGLE_REDIRECT_URL = secret.get(2);
+
+      reader.close();
+      in.close();
       
     } catch (Exception e) {
       System.out.println("The secret file could not be found on your system! Please check path!");
