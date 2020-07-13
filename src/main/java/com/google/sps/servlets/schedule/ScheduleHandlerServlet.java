@@ -79,7 +79,7 @@ public final class ScheduleHandlerServlet extends HttpServlet {
     response.setContentType("application/json");
     String links = "";
     
-    // Try to get resources!
+    // Try to get resources
     try {
       links = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
 

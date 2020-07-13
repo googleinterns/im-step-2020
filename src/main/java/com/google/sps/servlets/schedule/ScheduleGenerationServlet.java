@@ -91,16 +91,6 @@ public class ScheduleGenerationServlet extends HttpServlet {
 
     // Let's try to create events! We depend on RECURRING EVENTS. So, upto the next week, we try to create 
     Integer successfulEventsCreated = 0;
-    /*
-      
-      0 <-- 1
-      1 <-- 4
-      2 <-- 6
-      3 <-- 2
-      4 <-- 5
-      5 <-- 7
-      6 <-- 3
-    */
 
     // Set user calendars to get FreeBusy info here
     List<String> ids = getAllCalendarIds(httpClient, accessToken);
