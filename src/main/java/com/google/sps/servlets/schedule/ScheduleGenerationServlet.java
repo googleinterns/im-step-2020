@@ -144,7 +144,7 @@ public class ScheduleGenerationServlet extends HttpServlet {
     response.sendRedirect("/"); 
   }
 
-  // ---------------- Functions to upload to user's calendar ----------------- // 
+  // ---------------- Functions to create new calendar ----------------- // 
 
   JSONObject createNewCalendar(DefaultHttpClient httpClient, String accessToken, String summary) {
     NewCalendar calendar = new NewCalendar(summary);

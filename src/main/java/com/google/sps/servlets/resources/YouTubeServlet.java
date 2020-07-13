@@ -38,7 +38,7 @@ public class YouTubeServlet extends HttpServlet{
     // For example: ... DEVELOPER_KEY = "YOUR ACTUAL KEY";
 
     private static String DEVELOPER_KEY = "";
-    private static final String APPLICATION_NAME = "YouTube Data Retrieval";
+    private static final String APPLICATION_NAME = "First Time Coders";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private ArrayList<String> links = new ArrayList<String>();
 
@@ -74,7 +74,9 @@ public class YouTubeServlet extends HttpServlet{
         YouTube youtubeService = getService();
         long results = 5;
         // Use for creating links
-        String templateLink = "https://www.youtube.com/embed/"; //"https://www.youtube.com/watch?v=";
+        String embedTemplateLink = "https://www.youtube.com/embed/";
+        String directTemplateLink = "https://www.youtube.com/watch?v=";
+        String embedUrl = "";
         String directUrl = "";
         ResourceId videoId = new ResourceId();
         /* IF NEEDED: Use for video title
@@ -84,7 +86,7 @@ public class YouTubeServlet extends HttpServlet{
         // Define and execute the API request
         YouTube.Search.List api_request = youtubeService.search().list("snippet");
         SearchListResponse api_response = api_request.setKey(DEVELOPER_KEY)
-          .setQ("python programming beginner") // Q term (Search Term
+          .setQ("python programming beginner") // Q term (Search Term)
           .setOrder("relevance") // Relevant to Q term
           .setMaxResults(results) // Number of Videos
           .setType("video") // Specify we want videos, fixes issue of grabbing playlists
@@ -95,10 +97,12 @@ public class YouTubeServlet extends HttpServlet{
             // Retrieve the video's id
             videoId = (ResourceId)  api_response.getItems().get(i).get("id");
             // Create direct URL to video by appending the templated link and videoID
-            directUrl = templateLink + videoId.getVideoId();
+            embedUrl = embedTemplateLink + videoId.getVideoId();
+            directUrl = directTemplateLink + videoId.getVideoId();
             /* IF NEEDED: Pull the Video Title
             videoInfoSnippet = (SearchResultSnippet) api_response.getItems().get(i).get("snippet");       
             videoTitle = videoInfoSnippet.getTitle();*/
+            links.add(embedUrl);
             links.add(directUrl);
           }
         }
