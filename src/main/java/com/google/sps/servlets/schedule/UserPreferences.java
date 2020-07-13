@@ -19,12 +19,24 @@ import org.joda.time.DateTime;
 public class UserPreferences {
     private Time TIME = new Time();
 
+    // The starting week and day when the schedule begins from the current day.
+    // EX: START_DAY = 1; START_WEEK = 0; ---> We will start polling tomorrow!
+    public static int START_DAY = 1;
+    public static int START_WEEK = 0;
+
     // The number of events that we will try to set for the week.
     public static int MAX_EVENTS_LIGHT = 3;
     public static int MAX_EVENTS_MEDIUM = 4;
     public static int MAX_EVENTS_HIGH = 5;
-    public static int MAX_EVENTS_EXTREME = 6;
+    public static int MAX_EVENTS_EXTREME = 6; 
     public static int USER_EVENTS_CHOICE = MAX_EVENTS_LIGHT;
+
+    // The SPAN of the number of days that we try to set events for.  
+    // This is NOT how long our study schedule is. This is the valid day range in which we will try to evenly place events.
+    public static int EVENT_LOOK_SPAN = 7;
+
+    // How long should we repeat this event
+    public static int EVENT_RECURRENCE_LENGTH = 4; // in weeks
 
     // Possible study event sessions
     public Map<Integer, Integer> STUDY_SESSION_START_TIME = new LinkedHashMap<Integer, Integer>();

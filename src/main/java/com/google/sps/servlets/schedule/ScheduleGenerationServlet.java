@@ -70,7 +70,6 @@ public class ScheduleGenerationServlet extends HttpServlet {
       
     String accessToken = (String) request.getSession(false).getAttribute("access_token");
 
-    List<String> resources = (List<String>) request.getSession(false).getAttribute("resources");
 
     /////////////////////////// 1) Create Calendar
 
@@ -82,8 +81,8 @@ public class ScheduleGenerationServlet extends HttpServlet {
 
     ////////////////////////// 2) Create Events on Calendar
 
-    List<String> resource = (List<String>) request.getSession(false).getAttribute("resources"); // TODO: get from data store
-    System.out.println(resource);
+    List<String> resources = (List<String>) request.getSession(false).getAttribute("resources"); // TODO: get from data store
+    System.out.println(resources);
 
     // Grab timezone to be used with creation of event.
     JSONObject timeZoneSetting = getSetting(accessToken, "timezone");
@@ -92,31 +91,59 @@ public class ScheduleGenerationServlet extends HttpServlet {
 
     // Let's try to create events! We depend on RECURRING EVENTS. So, upto the next week, we try to create 
     Integer successfulEventsCreated = 0;
-    for (int i = 0; i < 7; i++) {
+    /*
+      
+      0 <-- 1
+      1 <-- 4
+      2 <-- 6
+      3 <-- 2
+      4 <-- 5
+      5 <-- 7
+      6 <-- 3
+    */
+
+    // Set user calendars to get FreeBusy info here
+    List<String> ids = getAllCalendarIds(httpClient, accessToken);
+
+    Integer stepValue = USER.EVENT_LOOK_SPAN / 2;
+    Integer day = 0;
+    List<Integer> eventAlreadyScheduled = new ArrayList<Integer>();
+
+    for (int i = 0; i < USER.EVENT_LOOK_SPAN; i++) {
+      // If we created max number of events
       if (successfulEventsCreated == UserPreferences.USER_EVENTS_CHOICE) break;
 
-      // Get resources
+      // If day is greater than or equal to span
+      if (day >= USER.EVENT_LOOK_SPAN) {
+        day = 0;
+        // Move day to next day that was not already scheduled
+        for (Integer event : eventAlreadyScheduled) {
+          if (event == day) day++;
+          else break;
+        }
+        --stepValue;
+      }
+
+
       String res = "";
       try {
-        res = resource.get(i);
+        res = resources.get(i);
       } catch(Exception e) {
         res = USER.DESCRIPTION;
       }
 
-      // We can grab all of our resources here
-      // Add calendar ids to check:
-      List<String> ids = new ArrayList<String>();
-      ids.add("primary");
-      ids.add("c_q6hmddtul80v9e0js2e6df5dk8@group.calendar.google.com");
-      ids.add("google.com_3bfa816keojpcmrh9ou2fa0vp4@group.calendar.google.com");
-      ids.add(id);
-      List<DateTime> times = getStartInformationForPossibleEvent(httpClient, accessToken, i , timezone, ids);
+      List<DateTime> times = getStartInformationForPossibleEvent(httpClient, accessToken, day , timezone, ids);
       if (!times.isEmpty()) {
 
-        JSONObject event = createNewEvent(httpClient, accessToken, timezone, id, 0, times.get(0), times.get(1), "Study Session", res, 4);
+        JSONObject event = createNewEvent(httpClient, accessToken, timezone, id, times.get(0), times.get(1), "Study Session", res, USER.EVENT_RECURRENCE_LENGTH);
 
         ++successfulEventsCreated;
+        // Add day
+        eventAlreadyScheduled.add(day);
       } 
+
+      // Increase step value
+      day += stepValue;
     }
 
     //////////////////////// 4) Call Fixer | ALTER BY USER SETTING: just delete event / find next available time / force move to next day /
@@ -139,7 +166,7 @@ public class ScheduleGenerationServlet extends HttpServlet {
     return http.postWithData(httpClient, postRequest, json);
   } 
 
-  JSONObject createNewEvent(DefaultHttpClient httpClient, String accessToken, String timeZone, String id, int daysUntilStart, DateTime startTime, DateTime endTime, 
+  JSONObject createNewEvent(DefaultHttpClient httpClient, String accessToken, String timeZone, String id, DateTime startTime, DateTime endTime, 
   String summary, String description, int recurrenceLengthInWeeks) {
     
     // 1) Set start date and end date for recurrence
@@ -171,7 +198,6 @@ public class ScheduleGenerationServlet extends HttpServlet {
   }
 
   JSONObject getSetting(String accessToken, String setting) {
-    // 1) Grab timezone of user's Google Calendar
     GetSetting getSetting = new GetSetting();
     String json = "";
     try {
@@ -198,13 +224,25 @@ public class ScheduleGenerationServlet extends HttpServlet {
     return http.postWithData(httpClient, postRequest, json);
   }
 
+  JSONObject getCalendarsList(DefaultHttpClient httpClient, String accessToken) {
+    ListCalendars list =  new ListCalendars();
+    String json = "";
+    try {
+      json = http.get(list.createListCalendarsURL(accessToken));
+    } catch (Exception e) {
+      System.out.println("There was an error getting the list of calendars." + e);
+    }
+    return http.parseJSON(json);
+  }
+
 
   // ----------------- // Utility Event Functions // --------------------- //
   // NOTE: timeMin and timeMax will be used in freeBusy span time. startDate is used for the date to try. These HAVE TO MATCH UP!
+  // This function will be used to get possible start times, for an event
   public List<DateTime> getStartInformationForPossibleEvent(DefaultHttpClient httpClient, String accessToken, Integer currentDate, String timeZone, List<String> ids ) {
     // Get length of current date
-    String dayStart = TIME.setTime(0, currentDate, 0, 0);
-    String dayEnd = TIME.setTime(0, currentDate, 23, 59);
+    String dayStart = TIME.setTime(0 + USER.START_WEEK, currentDate + USER.START_DAY, 0, 0);
+    String dayEnd = TIME.setTime(0 + USER.START_WEEK, currentDate + USER.START_DAY, 23, 59);
     
     JSONObject jsonObject = getFreeBusy(httpClient, accessToken, dayStart, dayEnd, timeZone, ids);
 
@@ -214,9 +252,9 @@ public class ScheduleGenerationServlet extends HttpServlet {
 
     // Go through nested response
     JSONObject calendar = (JSONObject) jsonObject.get("calendars");
-    JSONObject primary = (JSONObject) calendar.get("primary");
-    JSONArray array = (JSONArray) primary.get("busy");
 
+    JSONObject obj = (JSONObject) calendar.get(ids.get(0));
+    JSONArray array = (JSONArray) obj.get("busy"); // array cannot be null so we must initialize it with primary id
     for (String id : ids) {
       if (id == ids.get(0)) continue; // So we don't add our primary ID twice!
       System.out.println("Adding: " + id + " to our array");
@@ -233,7 +271,8 @@ public class ScheduleGenerationServlet extends HttpServlet {
     // What are we trying to do?
     // We trying to determine if a time period is valid. So we loop through each time period and it's duration and check it against each busy period.
     // After it's been checked against every busy period and we haven't continued, then it's valid!
-    DateTime timeToTry = new DateTime().withZone(DateTimeZone.forID(TIME.timezone)).plusDays(currentDate);
+    // NOTE: We add 
+    DateTime timeToTry = new DateTime().withZone(DateTimeZone.forID(TIME.timezone)).plusWeeks(USER.START_WEEK).plusDays(currentDate + USER.START_DAY);
     DateTime timeToTryEnd = null;
 
     List<DateTime> listOfValidTimes = new ArrayList<DateTime>();
@@ -270,11 +309,11 @@ public class ScheduleGenerationServlet extends HttpServlet {
 
             // If study session ever overlaps with any of the busy overlaps WITH ANY busy interval we can no longer set that as an event!
             if (busyInterval.overlaps(studySession)) {
-              System.out.println("OVERLAPS: Busy Interval:  " + busyInterval + " ==================  Study Session: " + studySession);
+              //System.out.println("OVERLAPS: Busy Interval:  " + busyInterval + " ==================  Study Session: " + studySession);
               foundOverlap = true;
               break;
             } else {
-              System.out.println("NONE: Busy Interval:  " + busyInterval + " ==================  Study Session: " + studySession);
+              //System.out.println("NONE: Busy Interval:  " + busyInterval + " ==================  Study Session: " + studySession);
             }
           }
 
@@ -318,6 +357,25 @@ public class ScheduleGenerationServlet extends HttpServlet {
 
 
   */
+
+  // TODO(paytondennis): Change this function to UserPreference list. Just read from the list and return that.
+  // As soon as we get permission, we can invoke default preferences that the user can change.
+
+  // This function will be used to get all the calendar ID's
+  public List<String> getAllCalendarIds(DefaultHttpClient httpClient, String accessToken) {
+    List<String> ids =  new ArrayList<String>();
+    JSONObject userCalendars = getCalendarsList(httpClient, accessToken);
+    JSONArray items = (JSONArray) userCalendars.get("items");
+    Iterator iter = items.iterator();
+    while (iter.hasNext()) {
+      JSONObject calendarResource = (JSONObject) iter.next();
+      String calender_id = (String) calendarResource.get("id");
+      if (calender_id.contains("#")) continue;
+      ids.add(calender_id);
+      System.out.println(calender_id);
+    }
+    return ids;
+  }
 
   // ALTER BY USER SETTING: just delete event / find next available time / force move to next day / leave_as_is
   // the fixer should be given a list of days and then perform user action specified for events.
