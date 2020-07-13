@@ -20,10 +20,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.File;  // Import the File class
-import java.io.FileWriter;
-import java.io.FileNotFoundException;  // Import this class to handle errors
-import java.util.Scanner; // Import the Scanner class to read text files
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.InputStream;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -38,20 +37,20 @@ public class YouTubeServlet extends HttpServlet{
     // For example: ... DEVELOPER_KEY = "YOUR ACTUAL KEY";
 
     private static String DEVELOPER_KEY = "";
-    private static final String APPLICATION_NAME = "YouTube Data Retrieval";
+    private static final String APPLICATION_NAME = "First Time Coders";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private ArrayList<String> links = new ArrayList<String>();
 
     public void init() {
       try {
-        File myFile = new File("yt-key.txt");
-        Scanner myReader = new Scanner(myFile);
-        while (myReader.hasNextLine()) {
-          DEVELOPER_KEY = myReader.nextLine();
+        InputStream in = YouTubeServlet.class.getResourceAsStream("/yt-key.txt");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        while (reader.ready()) {
+          DEVELOPER_KEY = reader.readLine();
         }
-        myReader.close();
-        System.out.println("Init completed");
-      } catch (FileNotFoundException e) {
+        reader.close();
+        System.out.println("YouTube Servlet Init completed");
+      } catch (Exception e) {
         System.out.println("Error: " + e);
       }
     }
@@ -74,7 +73,9 @@ public class YouTubeServlet extends HttpServlet{
         YouTube youtubeService = getService();
         long results = 5;
         // Use for creating links
-        String templateLink = "https://www.youtube.com/embed/"; //"https://www.youtube.com/watch?v=";
+        String embedTemplateLink = "https://www.youtube.com/embed/";
+        String directTemplateLink = "https://www.youtube.com/watch?v=";
+        String embedUrl = "";
         String directUrl = "";
         ResourceId videoId = new ResourceId();
         /* IF NEEDED: Use for video title
@@ -84,7 +85,7 @@ public class YouTubeServlet extends HttpServlet{
         // Define and execute the API request
         YouTube.Search.List api_request = youtubeService.search().list("snippet");
         SearchListResponse api_response = api_request.setKey(DEVELOPER_KEY)
-          .setQ("python programming beginner") // Q term (Search Term
+          .setQ("python programming beginner") // Q term (Search Term)
           .setOrder("relevance") // Relevant to Q term
           .setMaxResults(results) // Number of Videos
           .setType("video") // Specify we want videos, fixes issue of grabbing playlists
@@ -95,10 +96,12 @@ public class YouTubeServlet extends HttpServlet{
             // Retrieve the video's id
             videoId = (ResourceId)  api_response.getItems().get(i).get("id");
             // Create direct URL to video by appending the templated link and videoID
-            directUrl = templateLink + videoId.getVideoId();
+            embedUrl = embedTemplateLink + videoId.getVideoId();
+            directUrl = directTemplateLink + videoId.getVideoId();
             /* IF NEEDED: Pull the Video Title
             videoInfoSnippet = (SearchResultSnippet) api_response.getItems().get(i).get("snippet");       
             videoTitle = videoInfoSnippet.getTitle();*/
+            links.add(embedUrl);
             links.add(directUrl);
           }
         }
