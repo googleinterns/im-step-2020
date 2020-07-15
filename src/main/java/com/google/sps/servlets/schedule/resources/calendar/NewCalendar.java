@@ -1,5 +1,6 @@
 package com.google.sps.servlets;
 
+// See more information here: https://developers.google.com/calendar/v3/reference/calendars/insert
 
 /** Add a new calendar to the user's list of calendars */
 public class NewCalendar {

@@ -1,5 +1,6 @@
 package com.google.sps.servlets;
 
+// See more information here: https://developers.google.com/calendar/v3/reference/settings/get
 
 /** Read a setting from the user's calendar */
 public class GetSetting {
