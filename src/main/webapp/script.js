@@ -194,6 +194,14 @@ function getSrcStudyCalString(studyID) {
 // customization to the calendar display. This will change in
 // future updates
 function getSrcLastString() {
-    var last = "color=%23039BE5&amp;color=%237986CB";
+    var last = "color=%23616161&amp;color=%23cc94c1";
     return last;
 }
+
+/*
+<iframe src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=1&amp;bgcolor=%23616161&amp;ctz=America%2FLos_Angeles&amp;
+src=bWFyaWNhcm9sQGdvb2dsZS5jb20&amp;src=Y19jYjhyNDgwc2xldGptY2Q4b2p2YzUwZmJib0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&amp;
+color=%23616161&amp;color=%23cc94c1" style="border:solid 1px #777" width="1000" height="600" frameborder="0" scrolling="no"></iframe>
+*/
+
+/*color=%23039BE5&amp;color=%237986CB*/
