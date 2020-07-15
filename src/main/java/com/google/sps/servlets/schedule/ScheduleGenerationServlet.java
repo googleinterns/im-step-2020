@@ -90,13 +90,13 @@ public class ScheduleGenerationServlet extends HttpServlet {
     TIME.setTimeZoneId(timezone);
 
     // Let's try to create events! We depend on RECURRING EVENTS. So, upto the next week, we try to create 
-    Integer successfulEventsCreated = 0;
+    int successfulEventsCreated = 0;
 
     // Set user calendars to get FreeBusy info here
     List<String> ids = getAllCalendarIds(httpClient, accessToken);
 
-    Integer stepValue = USER.EVENT_LOOK_SPAN / 2;
-    Integer day = 0;
+    int stepValue = USER.EVENT_LOOK_SPAN / 2;
+    int day = 0;
     List<Integer> eventAlreadyScheduled = new ArrayList<Integer>();
 
     for (int i = 0; i < USER.EVENT_LOOK_SPAN; i++) {
@@ -227,7 +227,6 @@ public class ScheduleGenerationServlet extends HttpServlet {
 
 
   // ----------------- // Utility Event Functions // --------------------- //
-  // NOTE: timeMin and timeMax will be used in freeBusy span time. startDate is used for the date to try. These HAVE TO MATCH UP!
   // This function will be used to get possible start times, for an event
   public List<DateTime> getStartInformationForPossibleEvent(DefaultHttpClient httpClient, String accessToken, Integer currentDate, String timeZone, List<String> ids ) {
     // Get length of current date
@@ -267,6 +266,9 @@ public class ScheduleGenerationServlet extends HttpServlet {
 
     List<DateTime> listOfValidTimes = new ArrayList<DateTime>();
 
+    // Start with the max duration
+    for (Map.Entry<Integer,Integer> entry : USER.STUDY_SESSION_LENGTH.entrySet())  {
+
       // Loop through specific study session start times and see if one works.
       for (Map.Entry<Integer,Integer> time : USER.STUDY_SESSION_START_TIME.entrySet()) {
         timeToTry = timeToTry.withZone(DateTimeZone.forID(TIME.timezone)).withHourOfDay(time.getKey()).withMinuteOfHour(time.getValue()).withSecondOfMinute(0);
@@ -276,7 +278,6 @@ public class ScheduleGenerationServlet extends HttpServlet {
         if (new DateTime().isAfter(timeToTry)) continue;
 
         // Start with the max duration
-        for (Map.Entry<Integer,Integer> entry : USER.STUDY_SESSION_LENGTH.entrySet())  {
           Boolean foundOverlap = false;
           // Get duration of starttime
           timeToTryEnd = timeToTry.plusHours(entry.getKey()).plusMinutes(entry.getValue());
@@ -299,11 +300,8 @@ public class ScheduleGenerationServlet extends HttpServlet {
 
             // If study session ever overlaps with any of the busy overlaps WITH ANY busy interval we can no longer set that as an event!
             if (busyInterval.overlaps(studySession)) {
-              //System.out.println("OVERLAPS: Busy Interval:  " + busyInterval + " ==================  Study Session: " + studySession);
               foundOverlap = true;
               break;
-            } else {
-              //System.out.println("NONE: Busy Interval:  " + busyInterval + " ==================  Study Session: " + studySession);
             }
           }
 

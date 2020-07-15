@@ -17,8 +17,7 @@ import org.joda.time.DateTime;
 
 /** Preferences that we can change. */
 public class UserPreferences {
-    private Time TIME = new Time();
-
+    
     // The starting week and day when the schedule begins from the current day.
     // EX: START_DAY = 1; START_WEEK = 0; ---> We will start polling tomorrow!
     public static int START_DAY = 1;
