@@ -1,6 +1,9 @@
 package com.google.sps.servlets;
 
 
+
+// See more information here: https://developers.google.com/calendar/v3/reference/calendars/get
+
 /** Get calendar from ID. */
 public class GetCalendar {
 

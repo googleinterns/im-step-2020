@@ -20,10 +20,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.File;  // Import the File class
-import java.io.FileWriter;
-import java.io.FileNotFoundException;  // Import this class to handle errors
-import java.util.Scanner; // Import the Scanner class to read text files
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.InputStream;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -44,14 +43,14 @@ public class YouTubeServlet extends HttpServlet{
 
     public void init() {
       try {
-        File myFile = new File("yt-key.txt");
-        Scanner myReader = new Scanner(myFile);
-        while (myReader.hasNextLine()) {
-          DEVELOPER_KEY = myReader.nextLine();
+        InputStream in = YouTubeServlet.class.getResourceAsStream("/yt-key.txt");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        while (reader.ready()) {
+          DEVELOPER_KEY = reader.readLine();
         }
-        myReader.close();
-        System.out.println("Init completed");
-      } catch (FileNotFoundException e) {
+        reader.close();
+        System.out.println("YouTube Servlet Init completed");
+      } catch (Exception e) {
         System.out.println("Error: " + e);
       }
     }
