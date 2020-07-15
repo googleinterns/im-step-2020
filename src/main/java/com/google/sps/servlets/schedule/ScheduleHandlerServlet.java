@@ -63,15 +63,11 @@ public final class ScheduleHandlerServlet extends HttpServlet {
   }
 
   /** Read through all filters and SET THEM in User Preferences.java */
-
-
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws IOException {
     System.out.println("You're on the ScheduleHandler Servlet!");
-
-    //response.sendRedirect("/");
-
+    
     response.sendRedirect("/schedule-generator"); 
   }
 
@@ -83,7 +79,7 @@ public final class ScheduleHandlerServlet extends HttpServlet {
     response.setContentType("application/json");
     String links = "";
     
-    // Try to get resources!
+    // Try to get resources
     try {
       links = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
 
