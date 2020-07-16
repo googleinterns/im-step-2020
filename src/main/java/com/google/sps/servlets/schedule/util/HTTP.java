@@ -14,6 +14,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -57,6 +58,28 @@ public class HTTP {
       postRequest.setEntity(input);
 
       response = httpClient.execute(postRequest);
+
+      if (response.getStatusLine().getStatusCode() != 200) {
+        HttpEntity entity = response.getEntity();
+        String body = EntityUtils.toString(entity);
+
+        throw new RuntimeException("Expected 200 but got " + response.getStatusLine().getStatusCode() + ", with body " + body);
+      }
+    } catch (Exception e) {
+      System.out.println("Something went wrong!" + e);
+    }
+
+    return responseToJSON(response);
+  }
+
+  public JSONObject patchWithData(DefaultHttpClient httpClient, HttpPatch patchRequest, String json) {
+    HttpResponse response = null;
+    try {
+      StringEntity input = new StringEntity(json);
+      input.setContentType("application/json");
+      patchRequest.setEntity(input);
+
+      response = httpClient.execute(patchRequest);
 
       if (response.getStatusLine().getStatusCode() != 200) {
         HttpEntity entity = response.getEntity();

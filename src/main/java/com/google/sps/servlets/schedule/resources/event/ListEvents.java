@@ -7,13 +7,20 @@ import java.util.List;
 
 // See for more details: https://developers.google.com/calendar/v3/reference/events/list
 
-/** Get a list of user events for that day */
+/** Get a list of user events */
 public class ListEvents {
     
     // We should be getting the DATE 
-    public String createListEventURL(String calendar_id, String timeMax, String timeMin, String accessToken) {
+    public String createListEventsURL(String calendar_id, String accessToken) {
         return new StringBuilder("https://www.googleapis.com/calendar/v3/calendars/" + calendar_id + 
-        "/events?orderBy=startTime&singleEvents=true&timeMax=" + timeMax
-        + "&timeMin=" + timeMin + "&access_token=").append(accessToken).toString();
+        "/events?access_token=").append(accessToken).toString();
     }
 }
+
+/*
+return new StringBuilder("https://www.googleapis.com/calendar/v3/calendars/" + calendar_id + 
+        "/events?orderBy=startTime&singleEvents=true&timeMax=" + timeMax
+        + "&timeMin=" + timeMin + "?access_token=").append(accessToken).toString();
+
+
+*/
