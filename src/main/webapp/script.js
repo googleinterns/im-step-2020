@@ -75,43 +75,37 @@ function createIFrame(text) {
   return iFrameElement;
 }
 
-function getCalendarAttributes() {
-    fetch('/display-calendar-settings').then(response => response.json()).then((calendarAttrJSON) => {
+async function displayCalendarHandler() {  ////////////////////
+    try {
+        const response = await fetch('/display-calendar-settings');
+        const data = await response.json();
+        console.log(data);
 
-        var main_id = calendarAttrJSON.main;
-        var study_id = calendarAttrJSON.study;
-        var timezone = calendarAttrJSON.timezone;
+        calendarAttributes.push(data.main);
+        calendarAttributes.push(data.study);
+        calendarAttributes.push(data.timezone);
 
-        console.log("**CALENDAR 1 TEST**: main_id="+calendarAttrJSON.main);
-        console.log("**CALENDAR 1 TEST**: main_id="+calendarAttrJSON.study);
-        console.log("**CALENDAR 1 TEST**: main_id="+calendarAttrJSON.timezone);
-
-        calendarAttributes.push(main_id);
-        calendarAttributes.push(study_id);
-        calendarAttributes.push(timezone);
-
-        
-        console.log("~~in array: " + calendarAttributes[0]);
-        console.log("hello???????????????");
-
-    });
+        displayCalendar();
+    }
+    catch (e) {
+        console.log("Calendar IDs fetch failed");
+    }
 }
 
 // Main function handling Calendar display
 function displayCalendar() {
-    getCalendarAttributes();
 
     var main_id = calendarAttributes[0];
     var study_id = calendarAttributes[1];
     var timezone = calendarAttributes[2];
 
-    console.log("~~in array: " + calendarAttributes[0]);
-    console.log("~~in array: " + calendarAttributes[1]);
-    console.log("~~in array: " + calendarAttributes[2]);
+    console.log("~~in array: " + main_id);
+    console.log("~~in array: " + study_id);
+    console.log("~~in array: " + timezone);
 
-    var srcFirst = getSrcFirstString("timezone");
-    var srcMainCalID = getSrcMainCalString("main_id");
-    var srcStudyCalID = getSrcStudyCalString("study_id");
+    var srcMainCalID = getSrcMainCalString(main_id);
+    var srcStudyCalID = getSrcStudyCalString(study_id);
+    var srcFirst = getSrcFirstString(timezone);
     var srcLast = getSrcLastString();
 
     var src = srcFirst + srcMainCalID + srcStudyCalID + srcLast;
@@ -161,7 +155,7 @@ function getSrcFirstString(timezone) {
 function getSrcMainCalString(mainID) {
     //var mainID = "src=maricarol%40google.com&amp;"
     //var mainID = "src=bWFyaWNhcm9sQGdvb2dsZS5jb20&amp;";
-    var mainID = "maricarol@google.com";
+    //var mainID = "maricarol@google.com";
 
     var id = mainID.replace("@", "%40");
     var mainString = "src="+id+"&amp;";
@@ -179,7 +173,7 @@ function getSrcStudyCalString(studyID) {
     //var studyID = "src=c_g2o2196s4i3bteuk250r4mg528%40group.calendar.google.com&amp";
     //var studyID = "src=Y19uOHFnZHRkNzZvZDJiZHVkcnU1cG1idWdrMEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&amp";
 
-    var studyID = "c_cb8r480sletjmcd8ojvc50fbbo@group.calendar.google.com";
+    //var studyID = "c_cb8r480sletjmcd8ojvc50fbbo@group.calendar.google.com";
 
     var id = studyID.replace("@", "%40");
     var studyString = "src="+id+"&amp;";
@@ -197,3 +191,27 @@ function getSrcLastString() {
     var last = "color=%23039BE5&amp;color=%237986CB";
     return last;
 }
+
+
+
+/*
+const response = await fetch('/display-calendar-settings').then(response => response.json()).then((calendarAttrJSON) => {
+
+            var main_id = calendarAttrJSON.main;
+            var study_id = calendarAttrJSON.study;
+            var timezone = calendarAttrJSON.timezone;
+
+            console.log("**CALENDAR 1 TEST**: main_id="+calendarAttrJSON.main);
+            console.log("**CALENDAR 1 TEST**: main_id="+calendarAttrJSON.study);
+            console.log("**CALENDAR 1 TEST**: main_id="+calendarAttrJSON.timezone);
+
+            calendarAttributes.push(main_id);
+            calendarAttributes.push(study_id);
+            calendarAttributes.push(timezone);
+
+            
+            console.log("~~in array: " + calendarAttributes[0]);
+            console.log("hello???????????????");
+
+        });
+*/
