@@ -68,7 +68,7 @@ public final class ScheduleHandlerServlet extends HttpServlet {
     throws IOException {
     System.out.println("You're on the ScheduleHandler Servlet!");
     
-    response.sendRedirect("/");
+    response.sendRedirect("/schedule-generator"); 
   }
 
   /** We set the resources, we simply use this to build the schedule! */
