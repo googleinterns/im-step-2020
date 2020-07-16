@@ -1,0 +1,95 @@
+html { 
+  background: url(../images/pastelbackground.jpg) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+body {
+    color: white;
+    border-radius: 8px;
+    margin: 40px;
+    font-family: "DM Mono";
+    font-size: 22px;
+}
+
+h1 {
+  font-size: 200px;
+}
+
+textarea { 
+    background-color: black;
+    color: white;
+}
+
+.keywords-input {
+    font-size: 60px;
+}
+
+.resources-input {
+    font-size: 20px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 80px auto auto auto auto 80px; /*columns*/
+  grid-template-rows: 80px 300px 150px auto 80px; /*rows*/
+  padding: 10px;
+  width: 100vw;
+  height: 100vh;
+}
+
+.grid-item {
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.grid-header {
+  padding: 20px;
+  font-size: 100px;
+  text-align: center;
+  color: black;
+  height: 10px;
+}
+
+.grid-calendar {
+  padding: 20px;
+  font-size: 40px;
+  text-align: center;
+  color: black;
+  height: 10px;
+  width: 500px;
+}
+
+.grid-videos {
+  padding: 20px;
+  font-size: 40px;
+  text-align: right;
+  color: black;
+  height: 10px;
+  width: 500px;
+}
+
+.grid-resources {
+  padding: 20px;
+  text-align: left;
+  font-size: 20px;
+}
+
+a {
+  text-decoration: none;
+  display: inline-block;
+  padding: 8px 16px;
+}
+
+a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.next {
+  background-color: #dcb8b8;
+  color: white;
+}
