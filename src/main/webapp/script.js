@@ -13,7 +13,6 @@
 // limitations under the License.
 
 var clicked = false;
-var calendarAttributes = [];
 
 function getVideoResults() {
   var i;
@@ -84,11 +83,7 @@ async function displayCalendarHandler() {
         const data = await response.json();
         console.log(data);
 
-        calendarAttributes.push(data.main);
-        calendarAttributes.push(data.study);
-        calendarAttributes.push(data.timezone);
-
-        displayCalendar();
+        displayCalendar(data.main, data.study, data.timezone);
     }
     catch (e) {
         console.log("Calendar IDs fetch failed");
@@ -98,11 +93,7 @@ async function displayCalendarHandler() {
 // Called by displayCalendarHandler()
 // Puts together src string containing calendar id's to send to the
 // calendar iframe builder, then appends calendar iframe to HTML
-function displayCalendar() {
-    var main_id = calendarAttributes[0];
-    var study_id = calendarAttributes[1];
-    var timezone = calendarAttributes[2];
-
+function displayCalendar(main_id, study_id, timezone) {
     var src = getCalendarSrcString(main_id, study_id, timezone);
 
     const calendarElement = document.getElementById('calendar-display');
@@ -132,8 +123,8 @@ function getSrcFirstString(timezone) {
 // the user's main calendar.
 // For this part of the link, recieve user's main calendar ID
 // and parse it into the string
-function getSrcMainCalString(mainID) {
-    var id = mainID.replace("@", "%40");
+function getSrcMainCalString(main_id) {
+    var id = main_id.replace("@", "%40");
     var mainString = "src="+id+"&amp;";
     return mainString;
 }
@@ -142,8 +133,8 @@ function getSrcMainCalString(mainID) {
 // the user's study calendar.
 // For this part of the link, recieve user's study calendar ID
 // created by Schedule Handler and parse it into the string
-function getSrcStudyCalString(studyID) {
-    var id = studyID.replace("@", "%40");
+function getSrcStudyCalString(study_id) {
+    var id = study_id.replace("@", "%40");
     var studyString = "src="+id+"&amp;";
     return studyString;
 }
