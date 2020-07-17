@@ -8,43 +8,10 @@ html {
 
 body {
     color: white;
-    border-radius: 8px;
-    margin: 40px;
+    /*border-radius: 8px;
+    margin: 40px;*/
     font-family: "DM Mono";
     font-size: 22px;
-}
-
-h1 {
-  font-size: 120px;
-}
-
-.grid-container {
-  display: grid;
-  grid-template-columns: 80px 40% auto auto 80px; /*columns*/
-  grid-template-rows: 80px auto 200px auto auto 80px; /*rows*/
-  padding: 10px;
-  width: 100vw;
-  height: 100vh;
-}
-.grid-item {
-  /*border: 1px solid rgba(0, 0, 0, 0.2);*/
-  padding: 20px;
-  font-size: 30px;
-  text-align: left;
-}
-
-.grid-title {
-  padding: 20px;
-  font-size: 120px;
-  text-align: left;
-  text-align: top;
-}
-
-.grid-description {
-  padding: 20px;
-  font-size: 30px;
-  text-align: left;
-  text-align: top;
 }
 
 a {
@@ -61,4 +28,39 @@ a:hover {
 .next {
   background-color: #dcb8b8;
   color: white;
+}
+
+/*///////////////////////////*/
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+}
+
+.grid {
+  display: grid;
+  border: 1px solid black;
+  /*max-width: 800px;*/
+  grid-template-columns: 3fr 2fr;
+  grid-template-rows: 2fr 4fr 1fr;
+  grid-gap: 20px;
+  padding: 30px;
+}
+
+.sidebar {
+  grid-row-start: 1;
+  grid-row-end: 4;
+  grid-column-start: 2;
+}
+
+.title, .body, .button, .sidebar {
+  padding: 20px;
+  font-size: 20px;
+  border: 1px dotted #0074d9;
+  background-color: rgba(#0074d9, .1);
+}
+
+p {
+  padding: 0; margin: 0;
 }
