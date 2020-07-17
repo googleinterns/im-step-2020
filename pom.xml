@@ -64,8 +64,7 @@
           <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpclient</artifactId>
           <version>4.5.12</version>
-      </dependency>
-
+    </dependency>
       <!-- https://mvnrepository.com/artifact/org.json/json-simple -->
       <dependency>
         <groupId>com.googlecode.json-simple</groupId>
@@ -82,8 +81,8 @@
   
   <build>
     <plugins>
-      <!-- Provides `mvn package appengine:run` for local testing
-           and `mvn package appengine:deploy` for deploying. -->
+      <!-- Provides mvn package appengine:run for local testing
+           and mvn package appengine:deploy for deploying. -->
       <plugin>
         <groupId>com.google.cloud.tools</groupId>
         <artifactId>appengine-maven-plugin</artifactId>

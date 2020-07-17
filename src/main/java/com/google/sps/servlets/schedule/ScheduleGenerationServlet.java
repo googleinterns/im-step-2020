@@ -141,7 +141,7 @@ public class ScheduleGenerationServlet extends HttpServlet {
 
 		httpClient.getConnectionManager().shutdown();
    
-    response.sendRedirect("/"); 
+    response.sendRedirect("/home.html"); 
   }
 
   // ---------------- Functions to create new calendar ----------------- // 
