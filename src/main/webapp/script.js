@@ -39,8 +39,8 @@ function getVideoResults() {
           }
         }
       }
+      sendURLsToEvents(directUrls);
     });
-    sendURLsToEvents(directUrls);
   }
   clicked = true;
 }
