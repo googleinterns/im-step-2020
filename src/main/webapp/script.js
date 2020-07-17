@@ -188,30 +188,6 @@ function getSrcStudyCalString(studyID) {
 // customization to the calendar display. This will change in
 // future updates
 function getSrcLastString() {
-    var last = "color=%23039BE5&amp;color=%237986CB";
+    var last = "color=%23616161&amp;color=%23cc94c1";
     return last;
 }
-
-
-
-/*
-const response = await fetch('/display-calendar-settings').then(response => response.json()).then((calendarAttrJSON) => {
-
-            var main_id = calendarAttrJSON.main;
-            var study_id = calendarAttrJSON.study;
-            var timezone = calendarAttrJSON.timezone;
-
-            console.log("**CALENDAR 1 TEST**: main_id="+calendarAttrJSON.main);
-            console.log("**CALENDAR 1 TEST**: main_id="+calendarAttrJSON.study);
-            console.log("**CALENDAR 1 TEST**: main_id="+calendarAttrJSON.timezone);
-
-            calendarAttributes.push(main_id);
-            calendarAttributes.push(study_id);
-            calendarAttributes.push(timezone);
-
-            
-            console.log("~~in array: " + calendarAttributes[0]);
-            console.log("hello???????????????");
-
-        });
-*/

@@ -71,7 +71,7 @@ public class YouTubeServlet extends HttpServlet{
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {     
       try {
         YouTube youtubeService = getService();
-        long results = 5;
+        long results = 4;
         // Use for creating links
         String embedTemplateLink = "https://www.youtube.com/embed/";
         String directTemplateLink = "https://www.youtube.com/watch?v=";
