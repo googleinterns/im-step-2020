@@ -82,6 +82,10 @@ async function displayCalendarHandler() {
         const response = await fetch('/display-calendar-settings');
         const data = await response.json();
         console.log(data);
+        if (data.error != null) {
+          window.location.pathname = "/request-permission";
+          return;
+        }
 
         displayCalendar(data.main, data.study, data.timezone);
     }
@@ -154,6 +158,7 @@ function createCalendarIFrame(src) {
 
     var decoded = src.replace(/&amp;/g, '&');
 
+/*color=%23039BE5&amp;color=%237986CB*/
     iFrameElement.src = decoded;
     iFrameElement.style = "border:solid 1px #777";
     iFrameElement.width = "800";
@@ -161,4 +166,30 @@ function createCalendarIFrame(src) {
     iFrameElement.frameborder = "0";
     iFrameElement.scrolling = "no";
     return iFrameElement;
+}
+
+// This function simply grabs the input when the user presses enter.
+function setSearchInput(event) {
+  const input = document.getElementsByName("keywords-input");
+  if (event.keyCode === 13) {
+    const searchTerm = event.target.value.replace(/\n/g, "").trim();
+    if (confirm("Are you sure you would like to generate a schedule for '" + searchTerm + "'?")) {
+      getResourcesForCalendar(searchTerm);
+      input.value = ""; // User confirmed request. 
+      console.log("Schedule Generated!");
+    } else {
+      input.value = searchTerm; // User canceled.
+    }
+  }
+}
+
+// This function passes important information to ResourceServlets to get resources. Then simply calls ScheduleGeneration.
+async function getResourcesForCalendar(searchKeyword) {
+  // Grab current Calendar settings relevant to generate the schedule
+  const response = await fetch(`/get-calendar-settings?searchKeyword=${searchKeyword}`);
+  const resourceInformation = await response.json();
+
+  // Grab number of videos
+  const numberOfVideos = resourceInformation.numberOfVideos;
+  console.log(numberOfVideos);
 }
