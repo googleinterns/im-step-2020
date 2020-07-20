@@ -16,11 +16,3 @@ public class ListEvents {
         "/events?access_token=").append(accessToken).toString();
     }
 }
-
-/*
-return new StringBuilder("https://www.googleapis.com/calendar/v3/calendars/" + calendar_id + 
-        "/events?orderBy=startTime&singleEvents=true&timeMax=" + timeMax
-        + "&timeMin=" + timeMin + "?access_token=").append(accessToken).toString();
-
-
-*/
