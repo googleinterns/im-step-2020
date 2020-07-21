@@ -73,19 +73,10 @@ public class UserPreferences {
                 days = STUDY_SESSION_CUSTOM_DAYS;
                 break;
             case WEEKDAY:
-                days = new ArrayList<Integer>() {{
-                    add(1);
-                    add(2);
-                    add(3);
-                    add(4);
-                    add(5); // less than or equal to 5 according to JodaTime is the weekday
-                }};
+                days = new ArrayList(Arrays.asList(1, 2, 3, 4, 5)); // Mon (1) - Fri (5)
                 break;
             case WEEKEND:
-                days = new ArrayList<Integer>() {{
-                    add(6); // greater than or equal to 6 according to JodaTime is the weekend
-                    add(7);
-                }};
+                days = new ArrayList(Arrays.asList(6, 7)); // Sat (6) - Sun (7)
                 break;
             default:
                 days = new ArrayList<Integer>(); 
