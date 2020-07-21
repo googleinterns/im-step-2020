@@ -17,6 +17,7 @@ package com.google.sps.servlets;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -48,37 +49,51 @@ public final class DisplayCalendarSettingsServlet extends HttpServlet {
     throws IOException {
 
     String accessToken = (String) request.getSession(false).getAttribute("access_token");
-    if (accessToken == null) {
-      System.out.println("We must gain permission from the user to make this request!");
+
+    Boolean isValid = http.isAccessTokenValid(accessToken);
+    if (!isValid) {
+      JSONObject sendJSON = new JSONObject();
+      sendJSON.put("error", "The user did not give us permission.");
+      response.setContentType("application/json");
+      response.getWriter().print(sendJSON);
       return;
     }
 
+
     // Get timezone of calendar
     GetSetting getSetting = new GetSetting();
-    String json = http.get(getSetting.createGetSettingURL("timezone", accessToken));
-    JSONObject jsonObject = http.parseJSON(json);
-    String timezone = (String) jsonObject.get("value");
-    
-    // Get primary ID
-    GetCalendar getCalendar = new GetCalendar();
-    json = http.get(getCalendar.createGetCalendarURL("primary", accessToken));
-    jsonObject = http.parseJSON(json);
-    String main_id = (String) jsonObject.get("id");
+    String json = "";
+    try {
+      json = http.get(getSetting.createGetSettingURL("timezone", accessToken));
+      JSONObject jsonObject = http.parseJSON(json);
+      String timezone = (String) jsonObject.get("value");
+      
+      // Get primary ID
+      GetCalendar getCalendar = new GetCalendar();
+      json = http.get(getCalendar.createGetCalendarURL("primary", accessToken));
+      jsonObject = http.parseJSON(json);
+      String main_id = (String) jsonObject.get("id");
 
-    // Get study schedule ID
-    // TODO(paytondennis@): In the future we will store created schedules in Datastore. 
-    // Static variables w/ function, Loop through calendar id's for our study schedule 
-    // (we will eventually)
-    // NOTE: Our purpose is 
-    String study_id = (String) request.getSession(false).getAttribute("study-schedule-id");
-    if (study_id == null) study_id = "";
+      // Get study schedule ID
+      // TODO(paytondennis@): In the future we will store created schedules in Datastore. 
+      // Static variables w/ function, Loop through calendar id's for our study schedule 
+      // (we will eventually)
+      // NOTE: Our purpose is 
+      String study_id = (String) request.getSession(false).getAttribute("study-schedule-id");
+      if (study_id == null) study_id = "";
 
-    JSONObject sendJSON = new JSONObject();
-    sendJSON.put("main", main_id);
-    sendJSON.put("study", study_id);
-    sendJSON.put("timezone", timezone);
+      JSONObject sendJSON = new JSONObject();
+      sendJSON.put("main", main_id);
+      sendJSON.put("study", study_id);
+      sendJSON.put("timezone", timezone);
 
-    response.setContentType("application/json");
-    response.getWriter().print(sendJSON);
+      response.setContentType("application/json");
+      response.getWriter().print(sendJSON);
+      return;
+    } catch (Exception e) {
+      JSONObject sendJSON = new JSONObject();
+      sendJSON.put("error", "There was an error getting Display calendar information.");
+      System.out.println(e);
+    }
   }
 }
