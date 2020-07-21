@@ -75,10 +75,7 @@ public final class DisplayCalendarSettingsServlet extends HttpServlet {
       String main_id = (String) jsonObject.get("id");
 
       // Get study schedule ID
-      // TODO(paytondennis@): In the future we will store created schedules in Datastore. 
-      // Static variables w/ function, Loop through calendar id's for our study schedule 
-      // (we will eventually)
-      // NOTE: Our purpose is 
+      // TODO(paytondennis@): In the future we can store created schedules in Datastore. 
       String study_id = (String) request.getSession(false).getAttribute("study-schedule-id");
       if (study_id == null) study_id = "";
 
