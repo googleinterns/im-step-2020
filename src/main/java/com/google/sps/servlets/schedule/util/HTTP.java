@@ -132,6 +132,18 @@ public class HTTP {
 
   }
 
+  public Boolean isAccessTokenValid(String accessToken) {
+    try {
+      String json = get("https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + accessToken);
+      JSONObject jsonObject = parseJSON(json);
+      if (jsonObject.get("error") == "invalid_token") return false;
+      return true;
+    } catch (Exception e) {
+      System.out.println("There was an error checking the access token.");
+      return false;
+    }
+  }
+
 
 
   // TODO: You could just add this to postWithData, see if you need this with anything else

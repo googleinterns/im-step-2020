@@ -1,6 +1,7 @@
 package com.google.sps.servlets;
 
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
@@ -30,6 +31,11 @@ public class UserPreferences {
     public static int MAX_EVENTS_EXTREME = 6; 
     public static int USER_EVENTS_CHOICE = MAX_EVENTS_LIGHT;
 
+    // The day(s) where we will try to schedule study sessions.
+    public static enum  STUDY_SESSION_DAYS { WEEKDAY, WEEKEND, CUSTOM, NONE };
+    public static List<Integer> STUDY_SESSION_CUSTOM_DAYS = new ArrayList<Integer>();
+    public static STUDY_SESSION_DAYS STUDY_SESSION_DAYS_CHOICE = STUDY_SESSION_DAYS.NONE;
+
     // The SPAN of the number of days that we try to set events for.  
     // This is NOT how long our study schedule is. This is the valid day range in which we will try to evenly place events.
     public static int EVENT_LOOK_SPAN = 7;
@@ -38,30 +44,45 @@ public class UserPreferences {
     public static int EVENT_RECURRENCE_LENGTH = 4; // in weeks
 
     // Possible study event sessions
-    public Map<Integer, Integer> STUDY_SESSION_START_TIME = new LinkedHashMap<Integer, Integer>();
-    public Map<Integer, Integer> STUDY_SESSION_LENGTH = new LinkedHashMap<Integer, Integer>();
+    public static Map<Integer, Integer> STUDY_SESSION_START_TIME = new LinkedHashMap<Integer, Integer>() {{
+        put(9, 0); // 9AM
+        put(12, 0); // 12AM
+        put(16, 0); // 4PM
+        put(19, 0); // 7PM
+    }};
 
-    // Set description if no resources could be found
-    public static String DESCRIPTION = "Read for motivation: https://medium.com/dev-genius/why-you-should-stop-watching-tutorials-and-reading-docs-escaping-tutorial-purgatory-2c6b438b418 \n\n Best recommended free site: https://www.codecademy.com/\n\nBest recommended paid site: https://www.udemy.com/";
-    
+    public static Map<Integer, Integer> STUDY_SESSION_LENGTH = new LinkedHashMap<Integer, Integer>() {{
+        put(1, 0); // 1 hour
+        put(0, 30); // 30 minutes
+    }};
+
     // Fixer Function method of correcting events
     public static enum FixerCorrection { DELETE_EVENT, FIND_NEXT_AVAIL_TIME, FORCE_MOVE_TO_DAY, LEAVE_AS_IS };
     public static FixerCorrection FIXER_CORRECTION_CHOICE = FixerCorrection.FIND_NEXT_AVAIL_TIME;
 
-    // Set time points of where we will try to schedule an event -- 24HR TIME
-    public void applyStudySessionStartTimes() { 
-        STUDY_SESSION_START_TIME.put(9, 0); // 9AM
-        STUDY_SESSION_START_TIME.put(12, 0); // 12PM
-        STUDY_SESSION_START_TIME.put(16, 0); // 4PM
-        STUDY_SESSION_START_TIME.put(19, 0); // 7PM
-    }
-    
+    // Set description if no resources could be found or out of resources
+    public static String DESCRIPTION = new StringBuilder(
+       "Need some motivation: https://medium.com/dev-genius/why-you-should-stop-watching-tutorials-and-reading-docs-escaping-tutorial-purgatory-2c6b438b418\n\n" +
+       "Looking for extra free material?: https://www.codecademy.com/\nhttps://www.khanacademy.org/\n\n" + 
+       "Eager to pay for material?: https://www.udemy.com/\n\n" +
+       "Interview Prep?: https://leetcode.com/problemset/all/\nhttps://www.algoexpert.io/product").toString();
 
-    // Set Durations Of Our Study Sessions
-    public void applyDurationStartTimes() {
-        // hours, minutes
-        STUDY_SESSION_LENGTH.put(1, 0); // 1 hour
-        STUDY_SESSION_LENGTH.put(0, 30); // 30 minutes
+    public static List<Integer> getPossibleDays() {
+        List<Integer> days = new ArrayList<Integer>();
+        switch(STUDY_SESSION_DAYS_CHOICE) {
+            case CUSTOM:
+                days = STUDY_SESSION_CUSTOM_DAYS;
+                break;
+            case WEEKDAY:
+                days = new ArrayList(Arrays.asList(1, 2, 3, 4, 5)); // Mon (1) - Fri (5)
+                break;
+            case WEEKEND:
+                days = new ArrayList(Arrays.asList(6, 7)); // Sat (6) - Sun (7)
+                break;
+            default:
+                days = new ArrayList<Integer>(); 
+        }
+        return days;
     }
 }
 
