@@ -1,3 +1,5 @@
+/* Affects the entire page */
+
 html { 
   background: url(../images/pastelbackground.jpg) no-repeat center center fixed; 
   -webkit-background-size: cover;
@@ -7,15 +9,26 @@ html {
 }
 
 body {
-    color: white;
-    border-radius: 8px;
-    margin: 40px;
-    font-family: "DM Mono";
-    font-size: 22px;
+    color: black;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 30px;
 }
 
+div {
+    text-align: center;
+}
+
+/* Affects Text tags */
+
 h1 {
-  font-size: 200px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 80px;
+}
+
+p {
+    padding: 0; margin: 0;
+    font-family: 'Roboto', sans-serif;
+    font-size: 30px;
 }
 
 textarea { 
@@ -23,18 +36,62 @@ textarea {
     color: white;
 }
 
-.keywords-input {
-    font-size: 60px;
-}
-
-.resources-input {
+.keywords-display {
     font-size: 20px;
 }
 
+.resources-display {
+    font-size: 20px;
+}
+
+/* Affects Flexbox-Grid */
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-content: space-between;
+  /*align-items: center;*/
+  padding: 30px;
+  max-height: 100vh;
+}
+
+.grid {
+  display: grid;
+  justify-content: center;
+  border: 1px solid black;
+  grid-row-gap: 100px;
+  grid-template-columns: 2fr 3fr 2fr;
+  grid-template-rows: 2fr 3fr;
+  grid-gap: 20px;
+  padding: 30px;
+}
+
+.calendar-display{
+  padding: 20px;
+  /*grid-column-start: 1;
+  grid-column-end: 3;*/
+  grid-row-start: 2;
+}
+
+.video-display {
+  padding: 20px;
+  /*align-items: left;
+  /*grid-column-start: 3;
+  grid-column-end: 4;*/
+  grid-row-start: 2;
+}
+
+
+
+
+
+
+
+/*
 .grid-container {
   display: grid;
-  grid-template-columns: 80px auto auto auto auto 80px; /*columns*/
-  grid-template-rows: 80px 300px 150px auto 80px; /*rows*/
+  grid-template-columns: 80px auto auto auto auto 80px; /*columns
+  grid-template-rows: 80px 300px 150px auto 80px; /*rows
   padding: 10px;
   width: 100vw;
   height: 100vh;
@@ -93,3 +150,4 @@ a:hover {
   background-color: #dcb8b8;
   color: white;
 }
+*/
