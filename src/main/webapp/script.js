@@ -17,30 +17,31 @@ var clicked = false;
 function getVideoResults() {
   var i;
   let directUrls = []
-  if (!clicked) {
-      fetch('/videoResults').then(response => response.json()).then((data) => {
-      const dataListElement = document.getElementById('videoResults');
-      dataListElement.innerHTML = '';
-      console.log(dataListElement.innerHTML);
-      if (dataListElement.innerHTML == '') {
-        for (i=0; i<data.length; i++) {
-          // Even URLs are embedded, Odd are Direct URLs
-          if (i % 2 == 0) {
-            console.log("Embed", data[i]);
-            // Send embedded links to iframes on index.html
-            dataListElement.appendChild(
-              createIFrame(data[i]));
-          }
-          else {
-            console.log("Direct", data[i]);
-            // Add direct URLs to an array
-            directUrls.push(data[i]);
-          }
+  const dataListElement = document.getElementById('videoResults');
+  dataListElement.innerHTML = '';
+  sendNumOfVideos(5) // <<<<<<<<<<<<<< Payton's logic instead of 5
+  // if (!clicked) {
+  fetch('/videoResults').then(response => response.json()).then((data) => {
+    console.log(dataListElement.innerHTML);
+    if (dataListElement.innerHTML == '') {
+      for (i=0; i<data.length; i++) {
+        // Even URLs are embedded, Odd are Direct URLs
+        if (i % 2 == 0) {
+          console.log("Embed", data[i]);
+          // Send embedded links to iframes on index.html
+          dataListElement.appendChild(
+            createIFrame(data[i]));
+        }
+        else {
+          console.log("Direct", data[i]);
+          // Add direct URLs to an array
+          directUrls.push(data[i]);
         }
       }
-      sendURLsToEvents(directUrls);
-    });
-  }
+    }
+    sendURLsToEvents(directUrls);
+  });
+  //}
   clicked = true;
 }
 
@@ -67,6 +68,27 @@ async function sendURLsToEvents(urls) {
     console.log("fetch failed: ", e);
   }
 }
+
+async function sendNumOfVideos(num) {
+  try {
+    const response = await fetch('/videoResults', {
+      method: 'POST',
+      headers: {
+        'Content-Type' : 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(num)
+    });
+    const data = await response.json();
+    if (data === true) {
+      console.log("POST Request Succesful");
+    }
+  }
+  catch (e){
+    console.log("Failed");
+  }
+}
+
 
 function createIFrame(text) {
   const iFrameElement = document.createElement('iframe');
