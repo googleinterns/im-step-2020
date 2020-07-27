@@ -93,3 +93,8 @@ a:hover {
   background-color: #dcb8b8;
   color: white;
 }
+
+input::placeholder {
+  font-style: italic;
+  opacity: 0.5;
+}

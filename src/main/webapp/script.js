@@ -17,30 +17,31 @@ var clicked = false;
 function getVideoResults() {
   var i;
   let directUrls = []
-  if (!clicked) {
-      fetch('/videoResults').then(response => response.json()).then((data) => {
-      const dataListElement = document.getElementById('videoResults');
-      dataListElement.innerHTML = '';
-      console.log(dataListElement.innerHTML);
-      if (dataListElement.innerHTML == '') {
-        for (i=0; i<data.length; i++) {
-          // Even URLs are embedded, Odd are Direct URLs
-          if (i % 2 == 0) {
-            console.log("Embed", data[i]);
-            // Send embedded links to iframes on index.html
-            dataListElement.appendChild(
-              createIFrame(data[i]));
-          }
-          else {
-            console.log("Direct", data[i]);
-            // Add direct URLs to an array
-            directUrls.push(data[i]);
-          }
+  const dataListElement = document.getElementById('videoResults');
+  dataListElement.innerHTML = '';
+  sendNumOfVideos(5) // <<<<<<<<<<<<<< Payton's logic instead of 5
+  // if (!clicked) {
+  fetch('/videoResults').then(response => response.json()).then((data) => {
+    console.log(dataListElement.innerHTML);
+    if (dataListElement.innerHTML == '') {
+      for (i=0; i<data.length; i++) {
+        // Even URLs are embedded, Odd are Direct URLs
+        if (i % 2 == 0) {
+          console.log("Embed", data[i]);
+          // Send embedded links to iframes on index.html
+          dataListElement.appendChild(
+            createIFrame(data[i]));
+        }
+        else {
+          console.log("Direct", data[i]);
+          // Add direct URLs to an array
+          directUrls.push(data[i]);
         }
       }
-      sendURLsToEvents(directUrls);
-    });
-  }
+    }
+    sendURLsToEvents(directUrls);
+  });
+  //}
   clicked = true;
 }
 
@@ -68,6 +69,27 @@ async function sendURLsToEvents(urls) {
   }
 }
 
+async function sendNumOfVideos(num) {
+  try {
+    const response = await fetch('/videoResults', {
+      method: 'POST',
+      headers: {
+        'Content-Type' : 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(num)
+    });
+    const data = await response.json();
+    if (data === true) {
+      console.log("POST Request Succesful");
+    }
+  }
+  catch (e){
+    console.log("Failed");
+  }
+}
+
+
 function createIFrame(text) {
   const iFrameElement = document.createElement('iframe');
   iFrameElement.src = text;
@@ -82,6 +104,10 @@ async function displayCalendarHandler() {
         const response = await fetch('/display-calendar-settings');
         const data = await response.json();
         console.log(data);
+        if (data.error != null) {
+          window.location.pathname = "/request-permission";
+          return;
+        }
 
         displayCalendar(data.main, data.study, data.timezone);
     }
@@ -154,6 +180,7 @@ function createCalendarIFrame(src) {
 
     var decoded = src.replace(/&amp;/g, '&');
 
+/*color=%23039BE5&amp;color=%237986CB*/
     iFrameElement.src = decoded;
     iFrameElement.style = "border:solid 1px #777";
     iFrameElement.width = "800";
@@ -161,4 +188,30 @@ function createCalendarIFrame(src) {
     iFrameElement.frameborder = "0";
     iFrameElement.scrolling = "no";
     return iFrameElement;
+}
+
+// This function simply grabs the input when the user presses enter.
+function setSearchInput(event) {
+  const input = document.getElementsByName("keywords-input");
+  if (event.keyCode === 13) {
+    const searchTerm = event.target.value.replace(/\n/g, "").trim();
+    if (confirm("Are you sure you would like to generate a schedule for '" + searchTerm + "'?")) {
+      getResourcesForCalendar(searchTerm);
+      input.value = ""; // User confirmed request. 
+      console.log("Schedule Generated!");
+    } else {
+      input.value = searchTerm; // User canceled.
+    }
+  }
+}
+
+// This function passes important information to ResourceServlets to get resources. Then simply calls ScheduleGeneration.
+async function getResourcesForCalendar(searchKeyword) {
+  // Grab current Calendar settings relevant to generate the schedule
+  const response = await fetch(`/get-calendar-settings?searchKeyword=${searchKeyword}`);
+  const resourceInformation = await response.json();
+
+  // Grab number of videos
+  const numberOfVideos = resourceInformation.numberOfVideos;
+  console.log(numberOfVideos);
 }

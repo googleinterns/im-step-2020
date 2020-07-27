@@ -138,7 +138,7 @@ public class AuthorizationServlet extends HttpServlet {
    //       "refresh_token": "1/Hc1oTSLuw7NMc3qSQMTNqN6MlmgVafc78IZaGhwYS-o"
    //   }
 
-      // Get access token from JSON and request info from Google
+      // Get access token from JSON and request info from Google      
       JSONObject jsonObject = http.parseJSON(body);
 
       // Google tokens expire after an hour, but since we requested offline access we can get a new token without user involvement via the refresh token
@@ -147,7 +147,7 @@ public class AuthorizationServlet extends HttpServlet {
       // Store the access token in session. Now we have this access token across our servlets for about 30 minutes!
       req.getSession().setAttribute("access_token", accessToken);
 
-      resp.sendRedirect("/schedule-handler"); 
+      resp.sendRedirect("/home.html"); 
     }
   }
 }
