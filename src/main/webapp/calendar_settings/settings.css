@@ -1,0 +1,152 @@
+html {
+  background: #FFF;
+  text-align: center;
+  font-size: 15px;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; 
+}
+
+/* Text selection color */
+::selection {
+  background: #a7aba7; /* WebKit/Blink Browsers */
+}
+
+/* Background image */
+
+
+h1 {
+  font-size: 3em;
+  font-style: italic;
+}
+
+/* Using flex display for now */
+form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Basic Settings */
+.basic {
+  width: 50%;
+  color: rgb(78, 102, 89);
+}
+
+.basic h2 {
+  font-size: 5em; 
+  text-align: center;
+}
+
+/* Advanced Settings */
+.advanced {
+  width: 50%;
+  color: rgb(78, 102, 89);
+}
+
+.advanced h2 {
+  font-size: 5em;
+}
+
+/* Bold statements will stand out on the page */
+b {
+  color: black;
+}
+
+a {
+  border: rgb(144, 187, 132);
+  border-style: solid;
+  border-radius: 1em;
+  background-color: rgb(144, 187, 132);
+  color: white;
+  text-decoration: none;
+  padding: 2px;
+}
+
+h2 {
+  color: rgb(101, 129, 93);
+}
+
+/* Input */
+input {
+  overflow: initial;
+  border-radius: 3px;
+  padding: 4px;
+  border-color: rgb(73, 90, 74)
+}
+
+input:placeholder {
+  font-style: italic;
+}
+
+/* Hover effect on input */
+input[type="number"]:hover, input[type="text"]:hover {
+  transition: all 500ms ease;
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+/* Textarea */
+textarea {
+  border: 1px solid #cdcdcd;
+  border-color: rgba(0, 0, 0, .15);
+  background-color: rgba(243, 243, 243, 0.76);
+  font-size: 16px;
+}
+
+textarea::placeholder {
+  font-style: italic;
+}
+
+form .submit {
+  background-color: rgb(3, 51, 5); /* Green */
+  border-radius: 10px;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+/* Submit button */
+.submit:hover {
+  transition: all 500ms ease;
+  transform: scale(0.90);
+}
+
+.submit:active {
+  transform: scale(0.90); 
+  transition: all 500ms ease;
+  box-shadow: 3px 2px 22px 1px rgba(255, 255, 255, 0.24); 
+}
+
+/* To avoid overlapping text */
+@media only screen and (max-width: 1000px) {
+  form {
+    display: inline-block;
+    width: 100%;
+  }
+
+  .basic .advanced {
+    display: inline-block;
+    text-align: center;
+  }
+}
+
+/* Keyframe animation for fade-in. Adds a professional look to the page */
+.fade-in {
+	opacity: 1;
+	animation-name: fadeInOpacity;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-in;
+	animation-duration: 1s;
+}
+
+@keyframes fadeInOpacity {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
