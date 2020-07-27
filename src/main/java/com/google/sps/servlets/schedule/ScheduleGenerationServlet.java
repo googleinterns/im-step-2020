@@ -236,8 +236,8 @@ public class ScheduleGenerationServlet extends HttpServlet {
     JSONObject jsonObject = getFreeBusy(httpClient, accessToken, dayStart, dayEnd, timeZone, ids);
 
     // Set default preferences
-    USER.applyStudySessionStartTimes();
-    USER.applyDurationStartTimes();
+    //USER.applyStudySessionStartTimes();
+    //USER.applyDurationStartTimes();
 
     // Go through nested response
     JSONObject calendar = (JSONObject) jsonObject.get("calendars");
