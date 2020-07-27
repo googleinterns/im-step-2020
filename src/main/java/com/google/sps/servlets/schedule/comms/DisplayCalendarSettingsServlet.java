@@ -16,6 +16,7 @@ package com.google.sps.servlets;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.annotation.WebServlet;
@@ -38,13 +39,29 @@ import org.json.simple.parser.ParseException;
 
 
 /** Servlet that sends Calendar settings. */
+/** DisplayCalendarSettingsServlet sends 3 pieces of information to display the calendar settings
+ * To display calendar settings we need AT LEAST 2 pieces of information 
+ * 1) a calendar ID 2) timezone. This will be displayed using an iFrame.
+ * 
+ * As of now, we display the user's primary calendar and the study schedule ID.
+ * 
+ * We check if we have a calendar already on saved on the Servlet session, then we just send that one
+ * Else we check if the user has a Study Schedule on their list of calendars. Then we send that one
+ * Else we return an error that there is no calendar to display.
+ */
 @WebServlet("/display-calendar-settings")
 public final class DisplayCalendarSettingsServlet extends HttpServlet {
     private HTTP http = new HTTP();
 
 
   @Override
-  /** This can be extended to send other settings. */
+  /** doGet
+   * 
+   * The fields are as follows: timezone, primary id and study schedule id
+   * 
+   * @param request none
+   * @return response JSON object consisting of fields required to display the object
+   */
   public void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws IOException {
 
@@ -64,33 +81,112 @@ public final class DisplayCalendarSettingsServlet extends HttpServlet {
     GetSetting getSetting = new GetSetting();
     String json = "";
     try {
-      json = http.get(getSetting.createGetSettingURL("timezone", accessToken));
-      JSONObject jsonObject = http.parseJSON(json);
-      String timezone = (String) jsonObject.get("value");
+      String timezone = "";
+      if (Time.timezone == null) {
+        json = http.get(getSetting.createGetSettingURL("timezone", accessToken));
+        JSONObject jsonObject = http.parseJSON(json);
+        timezone = (String) jsonObject.get("value");
+      } else {
+        timezone = Time.timezone;
+      }
       
       // Get primary ID
       GetCalendar getCalendar = new GetCalendar();
       json = http.get(getCalendar.createGetCalendarURL("primary", accessToken));
-      jsonObject = http.parseJSON(json);
+      JSONObject jsonObject = http.parseJSON(json);
       String main_id = (String) jsonObject.get("id");
 
       // Get study schedule ID
-      // TODO(paytondennis@): In the future we can store created schedules in Datastore. 
       String study_id = (String) request.getSession(false).getAttribute("study-schedule-id");
-      if (study_id == null) study_id = "";
 
       JSONObject sendJSON = new JSONObject();
+      response.setContentType("application/json");
+
+      if (!currentCalendarIsValid(accessToken, study_id)) {
+        
+        // Check to see we have a study schedule on the user's calendar. NOTE: returns the latest
+        String latestStudyScheduleID = checkStudyScheduleOnCalendarList(accessToken);
+        if (!latestStudyScheduleID.equals("")) {
+          sendJSON.put("main", main_id);
+          sendJSON.put("study", latestStudyScheduleID);
+          sendJSON.put("timezone", timezone);
+          response.getWriter().print(sendJSON);
+          return;
+        }
+        sendJSON.put("errorDeletedSchedule", "Most recent study calendar has been deleted.");
+        return;
+      }
+
+      // Else our current study calendar is valid on our session is valid, return that
+
       sendJSON.put("main", main_id);
       sendJSON.put("study", study_id);
       sendJSON.put("timezone", timezone);
 
-      response.setContentType("application/json");
       response.getWriter().print(sendJSON);
       return;
     } catch (Exception e) {
       JSONObject sendJSON = new JSONObject();
-      sendJSON.put("error", "There was an error getting Display calendar information.");
+      sendJSON.put("error", "There was an error getting display calendar information.");
       System.out.println(e);
     }
+  }
+
+  // Makes sure the current calendar is valid.
+  public Boolean currentCalendarIsValid(String accessToken, String id) {
+    ListCalendars list =  new ListCalendars();
+    String json = "";
+    try {
+      json = http.get(list.createListCalendarsURL(accessToken));
+    } catch (Exception e) {
+      System.out.println("There was an error getting the list of calendars." + e);
+      return false;
+    }
+    JSONObject userCalendars = http.parseJSON(json);
+    JSONArray items = (JSONArray) userCalendars.get("items");
+    Iterator iter = items.iterator();
+
+    List<String> listAttr =  new ArrayList<String>();
+
+    // Check our last saved ID.
+    while (iter.hasNext()) {
+      JSONObject calendarResource = (JSONObject) iter.next();
+      String calenderAttr = (String) calendarResource.get("id");
+      listAttr.add(calenderAttr);
+    }
+
+    for (String calendar_id : listAttr) {
+      if (calendar_id.equals(id)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // If the study calendar ID is not in our session, look a Study Calendar on the user's Calendars
+  public String checkStudyScheduleOnCalendarList(String accessToken) {
+    ListCalendars list =  new ListCalendars();
+    String json = "";
+    try {
+      json = http.get(list.createListCalendarsURL(accessToken));
+    } catch (Exception e) {
+      System.out.println("There was an error getting the list of calendars." + e);
+      return "";
+    }
+    JSONObject userCalendars = http.parseJSON(json);
+    JSONArray items = (JSONArray) userCalendars.get("items");
+    Iterator iter = items.iterator();
+
+    // Check to see if any calendar has the title Study Schedule
+    while (iter.hasNext()) {
+      JSONObject calendarResource = (JSONObject) iter.next();
+      String id = (String) calendarResource.get("id");
+      String summary = (String) calendarResource.get("summary");
+      if (summary.equals("Study Schedule")) {
+        return id;
+      }
+    }
+
+    return "";
   }
 }
