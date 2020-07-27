@@ -1,7 +1,6 @@
-src/main/java/com/google/sps/servlets/resources/
-yt-key.txt
 target/
 yt-key.txt
+books-key.txt
 secret.txt
 .vscode
 .idea
