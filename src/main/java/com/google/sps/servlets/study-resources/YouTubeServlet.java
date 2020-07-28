@@ -113,7 +113,7 @@ public class YouTubeServlet extends HttpServlet{
         YouTube.Search.List api_request = youtubeService.search().list("snippet");
         
         if (!previousSearchTerm.equals(currentSearchTerm)) {
-          System.out.println("Do not need to re-query.")
+          System.out.println("Do not need to re-query.");
           links.clear();
         }
         if (links.size() == 0) { // Basically, will prevent duplicating the video links

@@ -183,8 +183,8 @@ function createCalendarIFrame(src) {
 /*color=%23039BE5&amp;color=%237986CB*/
     iFrameElement.src = decoded;
     iFrameElement.style = "border:solid 1px #777";
-    iFrameElement.width = "800";
-    iFrameElement.height = "600";
+    iFrameElement.width = "600"; /*"800";*/
+    iFrameElement.height = "750"; /*"600";*/
     iFrameElement.frameborder = "0";
     iFrameElement.scrolling = "no";
     return iFrameElement;

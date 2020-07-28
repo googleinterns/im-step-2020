@@ -25,12 +25,17 @@ h1 {
   font-size: 80px;
 }
 
+h2 {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 60px;
+  background: rgba(196, 204, 193, 0.7);
+}
+
 p {
     padding: 0; margin: 0;
     font-family: 'Roboto', sans-serif;
     font-size: 30px;
 }
-
 
 input::placeholder {
   font-style: italic;
@@ -50,25 +55,97 @@ textarea {
     font-size: 20px;
 }
 
+/* Affects the Resources Dropdown */
+.dropbtn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown:hover .dropbtn {
+  background-color: #3e8e41;
+}
+
+/* Affects Navigation-Bar */
+body {margin: 0;}
+
+ul.topnav {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+ul.topnav li {float: left;}
+
+ul.topnav li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+ul.topnav li a:hover:not(.active) {background-color: #111;}
+
+ul.topnav li a.active {background-color: #4CAF50;}
+
+ul.topnav li.right {float: right;}
+
+@media screen and (max-width: 600px) {
+  ul.topnav li.right, 
+  ul.topnav li {float: none;}
+}
+
 /* Affects Flexbox-Grid */
 
 .wrapper {
   display: flex;
   justify-content: center;
   align-content: space-between;
-  padding: 30px;
+  padding: 5px;
   max-height: 100vh;
 }
 
 .grid {
   display: grid;
   justify-content: center;
-  border: 1px solid black;
   grid-row-gap: 100px;
   grid-template-columns: 2fr 3fr 2fr;
   grid-template-rows: 2fr 3fr;
   grid-gap: 20px;
-  padding: 30px;
+  padding-top: 10px;
 }
 
 .calendar-display{
