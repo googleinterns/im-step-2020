@@ -180,7 +180,7 @@ function createCalendarIFrame(src) {
 
     var decoded = src.replace(/&amp;/g, '&');
 
-/*color=%23039BE5&amp;color=%237986CB*/
+    /*color=%23039BE5&amp;color=%237986CB*/
     iFrameElement.src = decoded;
     iFrameElement.style = "border:solid 1px #777";
     iFrameElement.width = "800";
