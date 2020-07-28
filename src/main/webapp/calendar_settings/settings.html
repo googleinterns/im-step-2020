@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Calendar Settings</title>
+        <link rel="stylesheet" href="settings.css">
+    </head>
+
+    <body>
+        <a href="/home.html">Go back</a>
+        <h1>Let's customize your schedule...</h1><hr>
+
+        <form class="form" action="/schedule-handler" method="GET" id="settings">
+            <input type="hidden" id="saveSettings" name="saveSettings" value="0">
+
+            <div class="basic fade-in">
+                <h2>Basic Settings</h2>
+
+                <!-- Start Day and Start Week -->
+                <div class="start">
+                    <b>Sets start time:</b>
+                    <br>
+                    <label for="startDay">Start Day (from now): e.g. a value of '1' - start looking 1 day from today (tomorrow)</label>
+                    <input type="number" name="startDay" id="startDay" value="1" min="0" max="6" placeholder="0-1"><br><br>
+
+                    <label for="startWeek">Start Week (from now): e.g. a value of '2' - start looking 2 weeks from today</label>
+                    <input type="number" name="startWeek" id="startWeek" value="0" min="0" max="12" placeholder="e.g. 1 to start next week"><br>
+                    <i>**Example: Start Day: 2 | Start Week: 1 == Start trying to place events 1 week from 2 days from now. **</i>
+                </div>
+                <br>
+
+                <!-- Study Schedule intensity -->
+                <b>Choose your study intensity:</b>
+                <br>
+                <input type="radio" id="light" name="intensity" value="3" required checked>
+                <label for="light">Light Intensity (3 study sessions / week)</label><br>
+
+                <input type="radio" id="medium" name="intensity" value="4">
+                <label for="medium">Medium Intensity (4 study sessions / week)</label><br>
+
+                <input type="radio" id="hard" name="intensity" value="5">
+                <label for="hard">Hard Intensity (5 study sessions / week)</label><br>
+
+                <input type="radio" id="expert" name="intensity" value="6">
+                <label for="expert">Expert Intensity (6 study sessions / week)</label><br><br>
+                <i>**Note the number of sessions will vary depending on your current calendar and settings, these are attempted values. **</i>
+
+                <br><br>
+
+                <!-- Description -->
+                <label for="description">Change the description that appears on each event: </label>
+                <textarea id="description" name="description" form="settings" placeholder="Enter text..." rows=6 cols=35></textarea><br><br><br>
+
+                <!-- On Days -->
+                <b>Choose 1 of the following:</b>
+                <br>
+                <input type="radio" id="weekDay" name="days" value="0" required checked>
+                <label for="weekDay">Study Sessions ONLY on Weekday</label><br>
+
+                <input type="radio" id="weekEnd" name="days" value="1">
+                <label for="weekEnd">Study Sessions ONLY on Weekends</label><br>
+
+                <input type="radio" id="custom" name="days" value="2">
+                <label for="custom">Custom Days</label><br>
+            </div>
+
+            <br><br>
+
+            <div class="advanced fade-in">
+                <h2>Advanced Settings</h2>
+
+                
+                <!-- Possible start times -->
+                <b>NOTE: (leftmost values will be prioritized first). Must include 0 for any value. e.g. 0hr 30min</b>
+                <br><br>
+                <label for="times">Enter possible start times: (leftmost prioritized first). Must include 0 for any value.</label><br><br>
+                <input type="text" id="times" name="times" minlength="0" size="50" value="9:00Am, 12:00pm, 7:00PM, 4:00Pm" required><br><br><br>
+
+                <!-- Possible durations -->
+                <label for="durations">Enter possible durations for each study session: (leftmost prioritized first). Must include 0 for any value.</label><br><br>
+                <input type="text" id="durations" name="durations" minlength="0" size="50" value="1hr 15min, 1 hour 0min, 0hr 30min" required><br><br><br>
+
+                <!-- Event Look Span -->
+                <label for="span">Span of time where we will try to set recurring events (in days): e.g. a value of '7' - means try to place recurring events within the next 7 days </label><br><br>
+                <input type="number" name="span" id="span" value="7" min="1" max="25" placeholder="1-25"><br><br><br>
+
+                <!-- Event Recurrence Length -->
+                <label for="recurrenceLength">How many weeks will this event occur (weekly): e.g. a value of '4' - means you will have events weekly for up to 4 weeks. </label><br><br>
+                <input type="number" name="recurrenceLength" id="recurrenceLength" value="4" min="1" max="25" placeholder="1-25"><br>
+            </div>
+
+
+            <br><br>
+
+            <input class="submit" type="submit" value="Save settings!">
+        </form>
+
+        <script src="./settings.js"></script>
+    </body>
+</html>
