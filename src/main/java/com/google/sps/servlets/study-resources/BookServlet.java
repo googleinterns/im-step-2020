@@ -72,7 +72,7 @@ public class BookServlet extends HttpServlet{
     try {
 
       Books bookService = getService();
-      long results = 40;
+      long results = 25;
       String title = "";
       String id = "";
       String url = "";
