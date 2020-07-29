@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var clicked = false;
 
 function getVideoResults() {
   var i;
@@ -20,9 +19,7 @@ function getVideoResults() {
   const dataListElement = document.getElementById('videoResults');
   dataListElement.innerHTML = '';
   sendNumOfVideos(5) // <<<<<<<<<<<<<< Payton's logic instead of 5
-  // if (!clicked) {
-  fetch('/videoResults').then(response => response.json()).then((data) => {
-    console.log(dataListElement.innerHTML);
+  fetch('/videoQuery').then(response => response.json()).then((data) => {
     if (dataListElement.innerHTML == '') {
       for (i=0; i<data.length; i++) {
         // Even URLs are embedded, Odd are Direct URLs
@@ -41,8 +38,6 @@ function getVideoResults() {
     }
     sendURLsToEvents(directUrls);
   });
-  //}
-  clicked = true;
 }
 
 async function sendURLsToEvents(urls) {
@@ -71,7 +66,7 @@ async function sendURLsToEvents(urls) {
 
 async function sendNumOfVideos(num) {
   try {
-    const response = await fetch('/videoResults', {
+    const response = await fetch('/videoQuery', {
       method: 'POST',
       headers: {
         'Content-Type' : 'application/json',
@@ -197,6 +192,7 @@ function setSearchInput(event) {
     if (confirm("Are you sure you would like to generate a schedule for '" + searchTerm + "'?")) {
       getResourcesForCalendar(searchTerm);
       input.value = ""; // User confirmed request. 
+      getVideoResults();
       console.log("Schedule Generated!");
     } else {
       input.value = searchTerm; // User canceled.
