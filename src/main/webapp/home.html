@@ -8,51 +8,36 @@
         <script src="script.js"></script>
         <title>First Time Coders</title>
     </head>
-
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Roboto&display=swap" rel="stylesheet">
     <body>
         <body onload="displayCalendarHandler();">
-        <div class="grid-container">
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>  
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>  
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>
-            <div class="grid-header">
-                "I will learn..."
-                <br>
-                <!-- <textarea class="keywords-input" rows="1" cols="14">    Python   </textarea> -->
-                <input onkeyup="setSearchInput(event);" class="keywords-input" type="search" name="keywords-input" placeholder="Enter search term e.g. Python">
+        <div class="wrapper">
+            <div class="grid">
+                <div class="resources">
+                    <p>Books n' Resources</p>
+                    <textarea class="resources-input" style="height:90%; width:90%; background-color:black;"></textarea>
+                </div>
+                <div class="key-display">
+                    <h1>"I will learn..."</h1>
+                    <input onkeyup="setSearchInput(event);" class="keywords-input" type="search" name="keywords-input" placeholder="Python">
+                    <br>
+                    <button onclick="getVideoResults()">Get the Videos</button>
+                </div>
+                <div class="learner-display">
+                    <p>Learning Level</p>
+                    <textarea class="learner-input" style="height:90%; width:90%; background-color:black;"></textarea>
+                </div>
+                <div class="calendar-display">
+                    <div id="calendar-display"></div>
+                </div>
+                <div class="video-display">
+                    <div id="videoResults"></div>
+                </div>
+                <div class="notes-display">
+                    <p>Notes</p>
+                    <textarea class="notes-input" style="height:90%; width:90%; background-color:black;"></textarea>
+                </div>
             </div>
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>  
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>  
-            <div class="grid-item"><button onclick="getVideoResults()">Get the Videos</button></div>
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>  
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>
-            <div class="grid-calendar">
-                <div id="calendar-display"></div>
-            </div>  
-            <div class="grid-videos">
-                <div id="videoResults"></div>
-            </div>
-            <div class="grid-resources">
-                <textarea class="resources-input" cols="60" style="height:100%; background-color:black;"></textarea>
-            </div>
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>  
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>  
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>
-            <div class="grid-item"></div>  
-            <div class="grid-item"></div>
         </div>
     </body>
 

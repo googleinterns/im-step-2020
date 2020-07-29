@@ -1,3 +1,5 @@
+package com.google.sps.servlets;
+
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -27,17 +29,18 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-@WebServlet("/bookResults")
+@WebServlet("/bookQuery")
 public class BookServlet extends HttpServlet{
 
   private static String DEVELOPER_KEY = "";
   private static final String APPLICATION_NAME = "First Time Coders";
+  private static String previousSearchTerm = "";
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
   private ArrayList<String> links = new ArrayList<String>();
 
   public void init() {
     try {
-        InputStream in = YouTubeServlet.class.getResourceAsStream("/books-key.txt");
+        InputStream in = BookServlet.class.getResourceAsStream("/books-key.txt");
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         while (reader.ready()) {
           DEVELOPER_KEY = reader.readLine();
@@ -72,29 +75,38 @@ public class BookServlet extends HttpServlet{
     try {
 
       Books bookService = getService();
-      long results = 40;
+      long results = 25;
+      String currentSearchTerm = (String) request.getSession(false).getAttribute("searchKeyword");
+      currentSearchTerm = currentSearchTerm.toLowerCase();
       String title = "";
       String id = "";
       String url = "";
       
       // Build query from Books API using volumes.list()
-      List api_request = bookService.volumes().list("items")
-      .setKey(DEVELOPER_KEY)
-      .setQ("Python Programming")
-      .setOrderBy("relevance")
-      .setPrintType("BOOKS")
-      .setMaxResults(results);
-      // Execute query
-      Volumes api_response = api_request.execute();
-
+      if (currentSearchTerm.equals(previousSearchTerm)) {
+        System.out.println("Do not query again: Books Servlet");
+      } else {
+        System.out.println("Query again: Books Servlet");
+        links.clear();
+      }
+  
       // Retrieve title,id and build URL
       if (links.size() == 0) {
+        List api_request = bookService.volumes().list("items")
+        .setKey(DEVELOPER_KEY)
+        .setQ(currentSearchTerm)
+        .setOrderBy("relevance")
+        .setPrintType("BOOKS")
+        .setMaxResults(results);
+        // Execute query
+        Volumes api_response = api_request.execute();
         for (int i = 0; i < (int) results; i++) {
           title = api_response.getItems().get(i).getVolumeInfo().getTitle();
           id = api_response.getItems().get(i).getId();
           url = makeURL(title, id);
           links.add(url);
         }
+        previousSearchTerm = currentSearchTerm;
       }
       String json = convertToJson(links);
 
