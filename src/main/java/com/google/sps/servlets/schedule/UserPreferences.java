@@ -16,7 +16,15 @@ import java.util.LinkedHashMap; // to take note of order
 import org.joda.time.DateTimeZone;
 import org.joda.time.DateTime;
 
-/** Preferences that we can change. */
+/** This is our storage for the User's current settings.
+ * The ScheduleGeneration takes these into account!
+ *  
+ * Currently, the settings.html page displays an incorrect view of the settings.
+ * Due to the fact that it's statically generated.
+ * 
+ * @param none
+ * @return none 
+*/
 public class UserPreferences {
     
     // The starting week and day when the schedule begins from the current day.
@@ -31,6 +39,9 @@ public class UserPreferences {
     public static int MAX_EVENTS_EXTREME = 6; 
     public static int USER_EVENTS_CHOICE = MAX_EVENTS_LIGHT;
 
+    // User Current Resources
+    public static List<String> resources = new ArrayList<String>();
+
     // The day(s) where we will try to schedule study sessions.
     public static enum  STUDY_SESSION_DAYS { WEEKDAY, WEEKEND, CUSTOM, NONE };
     public static List<Integer> STUDY_SESSION_CUSTOM_DAYS = new ArrayList<Integer>();
@@ -43,22 +54,16 @@ public class UserPreferences {
     // How long should we repeat this event
     public static int EVENT_RECURRENCE_LENGTH = 4; // in weeks
 
-    // Possible study event sessions
-    public static Map<Integer, Integer> STUDY_SESSION_START_TIME = new LinkedHashMap<Integer, Integer>() {{
-        put(9, 0); // 9AM
-        put(12, 0); // 12AM
-        put(16, 0); // 4PM
-        put(19, 0); // 7PM
-    }};
+    // Possible study event session times
+    public static List<List<Integer>> STUDY_SESSION_START_TIME = new ArrayList<List<Integer>>();
 
-    public static Map<Integer, Integer> STUDY_SESSION_LENGTH = new LinkedHashMap<Integer, Integer>() {{
-        put(1, 0); // 1 hour
-        put(0, 30); // 30 minutes
-    }};
+    // Possible study event session durations
+    public static List<List<Integer>> STUDY_SESSION_LENGTH = new ArrayList<List<Integer>>();
+
 
     // Fixer Function method of correcting events
-    public static enum FixerCorrection { DELETE_EVENT, FIND_NEXT_AVAIL_TIME, FORCE_MOVE_TO_DAY, LEAVE_AS_IS };
-    public static FixerCorrection FIXER_CORRECTION_CHOICE = FixerCorrection.FIND_NEXT_AVAIL_TIME;
+    public static enum FixerCorrection { DELETE_EVENT, FIND_NEXT_AVAIL_TIME, NONE };
+    public static FixerCorrection FIXER_CORRECTION_CHOICE = FixerCorrection.DELETE_EVENT;
 
     // Set description if no resources could be found or out of resources
     public static String DESCRIPTION = new StringBuilder(
@@ -83,6 +88,28 @@ public class UserPreferences {
                 days = new ArrayList<Integer>(); 
         }
         return days;
+    }
+
+    /** UTILITY: These 2 functions allow us to apply defaults 
+     * In case the user provided nothing here 
+    * 
+    * @param none
+    * @return none
+    */
+    public static void applyDefaultDuration() {
+        // Durations of study session.
+        STUDY_SESSION_LENGTH.clear();
+        STUDY_SESSION_LENGTH.add(new ArrayList<Integer>(Arrays.asList(1, 0))); // 1 hour
+        STUDY_SESSION_LENGTH.add(new ArrayList<Integer>(Arrays.asList(0, 30))); // 30 minutes
+    }
+    
+    public static void applyDefaultStartTime() {
+        // Start time of study sessions.
+        STUDY_SESSION_START_TIME.clear();
+        STUDY_SESSION_START_TIME.add(new ArrayList<Integer>(Arrays.asList(9, 0))); // 9 AM
+        STUDY_SESSION_START_TIME.add(new ArrayList<Integer>(Arrays.asList(12, 0))); // 12 AM
+        STUDY_SESSION_START_TIME.add(new ArrayList<Integer>(Arrays.asList(16, 0))); // 4 PM
+        STUDY_SESSION_START_TIME.add(new ArrayList<Integer>(Arrays.asList(19, 0))); // 7 PM
     }
 }
 
