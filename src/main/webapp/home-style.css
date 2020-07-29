@@ -1,3 +1,5 @@
+/* Affects the entire page */
+
 html { 
   background: url(../images/pastelbackground.jpg) no-repeat center center fixed; 
   -webkit-background-size: cover;
@@ -7,15 +9,32 @@ html {
 }
 
 body {
-    color: white;
-    border-radius: 8px;
-    margin: 40px;
-    font-family: "DM Mono";
-    font-size: 22px;
+    color: black;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 30px;
 }
 
+div {
+    text-align: center;
+}
+
+/* Affects Text tags */
+
 h1 {
-  font-size: 200px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 80px;
+}
+
+p {
+    padding: 0; margin: 0;
+    font-family: 'Roboto', sans-serif;
+    font-size: 30px;
+}
+
+
+input::placeholder {
+  font-style: italic;
+  opacity: 0.5;
 }
 
 textarea { 
@@ -23,78 +42,41 @@ textarea {
     color: white;
 }
 
-.keywords-input {
-    font-size: 60px;
-}
-
-.resources-input {
+.keywords-display {
     font-size: 20px;
 }
 
-.grid-container {
+.resources-display {
+    font-size: 20px;
+}
+
+/* Affects Flexbox-Grid */
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-content: space-between;
+  padding: 30px;
+  max-height: 100vh;
+}
+
+.grid {
   display: grid;
-  grid-template-columns: 80px auto auto auto auto 80px; /*columns*/
-  grid-template-rows: 80px 300px 150px auto 80px; /*rows*/
-  padding: 10px;
-  width: 100vw;
-  height: 100vh;
+  justify-content: center;
+  border: 1px solid black;
+  grid-row-gap: 100px;
+  grid-template-columns: 2fr 3fr 2fr;
+  grid-template-rows: 2fr 3fr;
+  grid-gap: 20px;
+  padding: 30px;
 }
 
-.grid-item {
+.calendar-display{
   padding: 20px;
-  font-size: 30px;
-  text-align: center;
+  grid-row-start: 2;
 }
 
-.grid-header {
+.video-display {
   padding: 20px;
-  font-size: 100px;
-  text-align: center;
-  color: black;
-  height: 10px;
-}
-
-.grid-calendar {
-  padding: 20px;
-  font-size: 40px;
-  text-align: center;
-  color: black;
-  height: 10px;
-  width: 500px;
-}
-
-.grid-videos {
-  padding: 20px;
-  font-size: 40px;
-  text-align: right;
-  color: black;
-  height: 10px;
-  width: 500px;
-}
-
-.grid-resources {
-  padding: 20px;
-  text-align: left;
-  font-size: 20px;
-}
-
-a {
-  text-decoration: none;
-  display: inline-block;
-  padding: 8px 16px;
-}
-
-a:hover {
-  background-color: #ddd;
-  color: black;
-}
-
-.next {
-  background-color: #dcb8b8;
-  color: white;
-}
-
-input::placeholder {
-  font-style: italic;
-  opacity: 0.5;
+  grid-row-start: 2;
 }

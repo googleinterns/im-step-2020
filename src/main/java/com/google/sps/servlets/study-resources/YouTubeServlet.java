@@ -3,6 +3,7 @@
  * See instructions for running these code samples locally:
  * https://developers.google.com/explorer-help/guides/code_samples#java
  */
+package com.google.sps.servlets;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
@@ -41,14 +42,17 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 import com.google.gson.*;
 
-@WebServlet("/videoResults")
+@WebServlet("/videoQuery")
 public class YouTubeServlet extends HttpServlet{
     // Need Dev-Key to make an authorized search.
     // For example: ... DEVELOPER_KEY = "YOUR ACTUAL KEY";
     private static int NUM_VIDEOS = 0;
+    private static  String previousSearchTerm = "";
     private static String DEVELOPER_KEY = "";
     private static final String APPLICATION_NAME = "First Time Coders";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+    private static final String EMBED_TEMP_LINK = "https://www.youtube.com/embed/";
+    private static final String DIRECT_TEMP_LINK = "https://www.youtube.com/watch?v=";
     private ArrayList<String> links = new ArrayList<String>();
 
     public void init() {
@@ -82,13 +86,15 @@ public class YouTubeServlet extends HttpServlet{
       System.out.println("GET Request: YouTubeServlet");     
       try {
         YouTube youtubeService = getService();
-        long results = NUM_VIDEOS;
+        long results = 0;
+        if (NUM_VIDEOS == 0) {
+          results = 1;
+        } else {
+          results = NUM_VIDEOS;
+        }
         // Use for creating links
-        String embedTemplateLink = "https://www.youtube.com/embed/";
-        String directTemplateLink = "https://www.youtube.com/watch?v=";
         String embedUrl = "";
         String directUrl = "";
-        String previousSearchTerm = "";
         String currentSearchTerm = (String) request.getSession(false).getAttribute("searchKeyword");
         ResourceId videoId = new ResourceId();
         SearchResultSnippet videoInfoSnippet = new SearchResultSnippet();
@@ -96,28 +102,33 @@ public class YouTubeServlet extends HttpServlet{
 
         // Check if the search term has programming in it (to filter out unrelated things)
         currentSearchTerm = currentSearchTerm.toLowerCase();
-        int indexOf = -1;
+        boolean termFound = false;
         String [] terms = currentSearchTerm.split(" ");
         for (String term : terms) {
           if (term.equals("programming")) { 
-            indexOf = 1;
+            termFound = true;
           }
         }
-        if (indexOf == -1) {
+        if (!termFound) {
           currentSearchTerm = currentSearchTerm + " programming";
         }
-        System.out.println(currentSearchTerm);
+        System.out.println("Previous Search: " + previousSearchTerm);
+        System.out.println("Current Search: " + currentSearchTerm);
         // Start Datastore Service
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         // Define and execute the API request
         YouTube.Search.List api_request = youtubeService.search().list("snippet");
-        
-        if (!previousSearchTerm.equals(currentSearchTerm)) {
-          System.out.println("Do not need to re-query.");
+    
+        // Check if we need to requery the same term
+        if (currentSearchTerm.equals(previousSearchTerm)) {
+          System.out.println("Do not query again: YouTube Servlet");
+        }
+        else {
+          System.out.println("Query again: YouTube Servlet");
           links.clear();
         }
+
         if (links.size() == 0) { // Basically, will prevent duplicating the video links
-          System.out.println("Quering videos");
           SearchListResponse api_response = api_request.setKey(DEVELOPER_KEY)
             .setQ(currentSearchTerm) // Q term (Search Term)
             .setOrder("relevance") // Relevant to Q term
@@ -129,8 +140,8 @@ public class YouTubeServlet extends HttpServlet{
             // Retrieve the video's id
             videoId = (ResourceId)  api_response.getItems().get(i).get("id");
             // Create direct URL to video by appending the templated link and videoID
-            embedUrl = embedTemplateLink + videoId.getVideoId();
-            directUrl = directTemplateLink + videoId.getVideoId();
+            embedUrl = EMBED_TEMP_LINK + videoId.getVideoId();
+            directUrl = DIRECT_TEMP_LINK + videoId.getVideoId();
             // Gather the video's Title
             videoInfoSnippet = (SearchResultSnippet) api_response.getItems().get(i).get("snippet");       
             videoTitle = videoInfoSnippet.getTitle();
@@ -152,7 +163,7 @@ public class YouTubeServlet extends HttpServlet{
             PreparedQuery queryResults = datastore.prepare(query);
             if (queryResults.asIterable().iterator().hasNext()) {
               for (Entity entity : queryResults.asIterable()) {
-                if ((String) entity.getProperty("URL") == directUrl) {
+                if (directUrl.equals((String) entity.getProperty("URL"))) {
                   inDatastore = true;
                 }
               }
@@ -161,9 +172,9 @@ public class YouTubeServlet extends HttpServlet{
               datastore.put(video);
             }
           }
+          // Keep track of if the search term changes
+          previousSearchTerm = currentSearchTerm;
         }
-        // Keep track of if the search term changes
-        previousSearchTerm = currentSearchTerm;
       }
       catch (GeneralSecurityException e) {
         response.setContentType("text/html;");
@@ -180,7 +191,7 @@ public class YouTubeServlet extends HttpServlet{
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
       /* TODO: Create a POST request to accept Payton's Servlet */
       System.out.println("POST Request: YouTubeServlet");
       // What are we accepting from Payton's Servlet
@@ -189,9 +200,11 @@ public class YouTubeServlet extends HttpServlet{
       try {
         info = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
         NUM_VIDEOS = Integer.parseInt(info);
-
+        
+        response.setContentType("text/html");
         response.getWriter().println(true);
       } catch (Exception e) {
+        response.getWriter().println(false);
         System.out.println("Issue Found: " + e);
       }
     }
