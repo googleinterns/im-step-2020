@@ -28,8 +28,10 @@ test("Description/Name of the test", () => {
 
 */
 
-const getSrcLastString = require("///home/maricarol/im-step-2020/src/main/webapp/script.js");
+
+
+const functions = require("///home/maricarol/im-step-2020/src/main/webapp/script.js");
 
 test("Returns the End section of the calendar src link", () => {
-    expect(getSrcLastString()).toBe("color=%23616161&amp;color=%23cc94c1");
+    expect(functions.getSrcLastString()).toBe("color=%23616161&amp;color=%23cc94c1");
 });

@@ -215,3 +215,9 @@ async function getResourcesForCalendar(searchKeyword) {
   const numberOfVideos = resourceInformation.numberOfVideos;
   console.log(numberOfVideos);
 }
+
+
+
+if (typeof exports !== undefined) {
+  module.exports = {getSrcLastString}
+}
