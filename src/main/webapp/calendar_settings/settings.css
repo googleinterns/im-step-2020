@@ -1,17 +1,25 @@
 html {
-  background: #FFF;
+  background: url(../images/pastelbackground.jpg) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
   text-align: center;
-  font-size: 15px;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; 
+  font-size: 20px;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+
+div {
+    text-align: center;
 }
 
 /* Text selection color */
 ::selection {
   background: #a7aba7; /* WebKit/Blink Browsers */
 }
-
-/* Background image */
-
 
 h1 {
   font-size: 3em;
@@ -29,7 +37,9 @@ form {
 /* Basic Settings */
 .basic {
   width: 50%;
-  color: rgb(78, 102, 89);
+  color: #f1f1f1;
+  font-family: 'Roboto', sans-serif;
+  font-weight:400;
 }
 
 .basic h2 {
@@ -40,7 +50,9 @@ form {
 /* Advanced Settings */
 .advanced {
   width: 50%;
-  color: rgb(78, 102, 89);
+  color: #f1f1f1;
+  font-family: 'Roboto', sans-serif;
+  font-weight:400;
 }
 
 .advanced h2 {
@@ -52,18 +64,10 @@ b {
   color: black;
 }
 
-a {
-  border: rgb(144, 187, 132);
-  border-style: solid;
-  border-radius: 1em;
-  background-color: rgb(144, 187, 132);
-  color: white;
-  text-decoration: none;
-  padding: 2px;
-}
-
 h2 {
   color: rgb(101, 129, 93);
+  /*-webkit-text-stroke-width: 1px; 
+  -webkit-text-stroke-color: whitesmoke;*/ 
 }
 
 /* Input */
@@ -98,7 +102,6 @@ textarea::placeholder {
 
 form .submit {
   background-color: rgb(3, 51, 5); /* Green */
-  border-radius: 10px;
   border: none;
   color: white;
   padding: 15px 32px;
@@ -149,4 +152,36 @@ form .submit {
 	100% {
 		opacity: 1;
 	}
+}
+
+/* Affects Navigation-Bar */
+body {margin: 0;}
+
+ul.topnav {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+ul.topnav li {float: left;}
+
+ul.topnav li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+ul.topnav li a:hover:not(.active) {background-color: #111;}
+
+ul.topnav li a.active {background-color: ##728678;}
+
+ul.topnav li.right {float: right;}
+
+@media screen and (max-width: 600px) {
+  ul.topnav li.right, 
+  ul.topnav li {float: none;}
 }

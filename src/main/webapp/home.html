@@ -13,10 +13,10 @@
         <body onload="displayCalendarHandler(); getResources();">
 
         <ul class="topnav">
-        <li><a class="active" href="/home.html">Home</a></li>
-        <li><a href="/guide.html">Guide</a></li>
-        <li><a href="/calendar_settings/settings.html">Settings</a></li>
-        <li class="right"><a href="/feedback.html">Feedback</a></li>
+            <li><a class="active" href="#">Home</a></li>
+            <li><a href="/guide.html">Guide</a></li>
+            <li><a href="/calendar_settings/settings.html">Settings</a></li>
+            <li class="right"><a href="/feedback.html">Feedback</a></li>
         </ul>
 
         <div class="wrapper">
@@ -63,7 +63,17 @@
                 </div>
                 <div class="learner-display">
                     <p>Learning Level</p>
-                    <textarea class="learner-input" style="height:90%; width:90%; background-color:#f1f1f1;"></textarea>
+                    <input type="radio" id="light" name="intensity" value="3" required checked>
+                    <label for="light">Light Intensity</label><br>
+
+                    <input type="radio" id="medium" name="intensity" value="4">
+                    <label for="medium">Medium Intensity</label><br>
+
+                    <input type="radio" id="hard" name="intensity" value="5">
+                    <label for="hard">Hard Intensity</label><br>
+
+                    <input type="radio" id="expert" name="intensity" value="6">
+                    <label for="expert">Expert Intensity</label><br><br>
                 </div>
                 <div class="calendar-display">
                     <p>Study Schedule</p>
