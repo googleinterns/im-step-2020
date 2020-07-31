@@ -1,5 +1,7 @@
 package com.google.sps.servlets;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -13,6 +15,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
@@ -33,6 +36,21 @@ public class HTTP {
   // makes a GET request to url and returns body as a string
   public String get(String url) throws ClientProtocolException, IOException {
     return execute(new HttpGet(url));
+  }
+
+  // makes a DELETE request to url and returns body as a string
+  public String delete(String url) throws ClientProtocolException, IOException {
+    //return execute(new HttpDelete(url));
+    HttpClient httpClient = new DefaultHttpClient();
+    HttpDelete delete = new HttpDelete(url);
+    HttpResponse response = httpClient.execute(delete);
+
+    if (response.getStatusLine().getStatusCode() != 200 && response.getStatusLine().getStatusCode() != 204) {
+      throw new RuntimeException("Failed to perform delete request with error code: " + response.getStatusLine().getStatusCode());
+    }
+
+    return "";
+    
   }
 
   // makes a POST request to url with form parameters and returns body as a string
