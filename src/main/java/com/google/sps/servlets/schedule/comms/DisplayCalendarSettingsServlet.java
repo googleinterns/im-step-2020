@@ -76,25 +76,28 @@ public final class DisplayCalendarSettingsServlet extends HttpServlet {
       return;
     }
 
+    // Get primary ID
+    GetCalendar getCalendar = new GetCalendar();
+    String json = http.get(getCalendar.createGetCalendarURL("primary", accessToken));
+    JSONObject jsonObject = http.parseJSON(json);
+    String main_id = (String) jsonObject.get("id");
+
+    // CREATE NEW USER TO DATABASE
+    // Note this does not duplicate entries
+    Datastore d = new Datastore();
+    d.manageUserSettings(main_id);
 
     // Get timezone of calendar
-    GetSetting getSetting = new GetSetting();
-    String json = "";
     try {
+      GetSetting getSetting = new GetSetting();
       String timezone = "";
       if (Time.timezone == null) {
         json = http.get(getSetting.createGetSettingURL("timezone", accessToken));
-        JSONObject jsonObject = http.parseJSON(json);
+        jsonObject = http.parseJSON(json);
         timezone = (String) jsonObject.get("value");
       } else {
         timezone = Time.timezone;
       }
-      
-      // Get primary ID
-      GetCalendar getCalendar = new GetCalendar();
-      json = http.get(getCalendar.createGetCalendarURL("primary", accessToken));
-      JSONObject jsonObject = http.parseJSON(json);
-      String main_id = (String) jsonObject.get("id");
 
       // Get study schedule ID
       String study_id = (String) request.getSession(false).getAttribute("study-schedule-id");
