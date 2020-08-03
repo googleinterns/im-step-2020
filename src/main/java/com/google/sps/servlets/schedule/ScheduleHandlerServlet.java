@@ -75,64 +75,35 @@ public final class ScheduleHandlerServlet extends HttpServlet {
    * @param request 
    * @return none we simply set the resources in our Servlet Session
   */
+
+  private Datastore DB = new Datastore();
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws IOException {
 
-    try {
-      int invalidCall = Integer.parseInt(request.getParameter("saveSettings"));
-    } catch (Exception e) {
-      if (UserPreferences.STUDY_SESSION_LENGTH.isEmpty()) UserPreferences.applyDefaultDuration();
-      if (UserPreferences.STUDY_SESSION_START_TIME.isEmpty()) UserPreferences.applyDefaultStartTime();
-      response.sendRedirect("/schedule-generator");
+    // Grab access token and make sure it's valid! REQUIRED!
+    String accessToken = (String) request.getSession(false).getAttribute("access_token");
+
+    Boolean isValid = new HTTP().isAccessTokenValid(accessToken);
+    if (!isValid) {
+      response.sendRedirect("/request-permission");
       return;
     }
 
-    
     try {
-      // Start Day
-      int startDay = Integer.parseInt(request.getParameter("startDay"));
-      UserPreferences.START_DAY = startDay;
-
-      // Start Week
-      int startWeek = Integer.parseInt(request.getParameter("startWeek"));
-      UserPreferences.START_WEEK = startWeek;
-
-      // Difficulty of schedule
-      int intensity = Integer.parseInt(request.getParameter("intensity"));
-      UserPreferences.USER_EVENTS_CHOICE = intensity;
-
-      // Description
-      String user_description = request.getParameter("description");
-      UserPreferences.DESCRIPTION = user_description;
-
-      // Start Day
-      int studySessionDays = Integer.parseInt(request.getParameter("days"));
-      if (studySessionDays == 0) {
-        UserPreferences.STUDY_SESSION_DAYS_CHOICE = UserPreferences.STUDY_SESSION_DAYS.WEEKDAY;
-      } else if (studySessionDays == 1) {
-        UserPreferences.STUDY_SESSION_DAYS_CHOICE = UserPreferences.STUDY_SESSION_DAYS.WEEKEND;
+      boolean generateSchedule = Boolean.parseBoolean(request.getParameter("generate"));
+      if (generateSchedule) {
+        response.sendRedirect("/schedule-generator");
+        return;
       }
-
-      // Get possible start times and end times for events
-      String startTimes = request.getParameter("times");
-      UserPreferences.STUDY_SESSION_START_TIME = processStartTimes(startTimes);
-
-      String duration = request.getParameter("durations");
-      UserPreferences.STUDY_SESSION_LENGTH = processDuration(duration);
-
-      // Event Look Span
-      int span = Integer.parseInt(request.getParameter("span"));
-      UserPreferences.EVENT_LOOK_SPAN = span;
-
-      // Start Recurrence Length
-      int recurLength = Integer.parseInt(request.getParameter("recurrenceLength"));
-      UserPreferences.EVENT_RECURRENCE_LENGTH = recurLength;
-
-      response.sendRedirect("/home.html");
     } catch (Exception e) {
-      System.out.println(e);
+      System.out.println("There was an error trying to determine if we want to generate the schedule: " + e);
     }
+
+    getInputAndSaveToDB(request, response);
+    response.sendRedirect("/home.html");
+
+    
   }
 
   /** COMMS: We set the resources in our session.
@@ -152,12 +123,154 @@ public final class ScheduleHandlerServlet extends HttpServlet {
       links = links.replaceAll("[\\]\\[ \\s]",""); // regex expression simply ignore brackets and spaces
       List<String> resources = new ArrayList<String>(Arrays.asList(links.split(",")));
       
-      UserPreferences.resources = resources;
+      // Get access token
+      String accessToken = (String) request.getSession(false).getAttribute("access_token");
+      // Get primary ID
+      GetCalendar getCalendar = new GetCalendar();
+      String json = new HTTP().get(getCalendar.createGetCalendarURL("primary", accessToken));
+      JSONObject jsonObject = new HTTP().parseJSON(json);
+      String primary_id = (String) jsonObject.get("id");
+
+      if (DB.getUser(primary_id) == null) {
+        response.sendRedirect("/request-permission");
+        return;
+      }
+
+      Gson g = new Gson();
+      json = g.toJson(resources);
+      DB.updateTextProperty(primary_id, "resources", json);
+      
 
       response.getWriter().print(true);
 
     } catch (Exception e) {
-      System.out.println("There was an error trying to get the resources!" + e);
+      System.out.println("There was an error trying to get the resources! " + e);
+      try {
+        response.sendRedirect("/home.html");
+        return;
+      } catch (Exception err) {
+        System.out.println(err);
+      }
+    }
+  }
+
+  /** getInputAndSaveToDB: Saves input to DB. 
+   * 
+   * @param request 
+   * @param response go back to home.html
+   * @return none simply fill to database
+  */
+  public void getInputAndSaveToDB(HttpServletRequest request, HttpServletResponse response) {
+    try {
+      // Get access token
+      String accessToken = (String) request.getSession(false).getAttribute("access_token");
+
+      // Get primary ID
+      GetCalendar getCalendar = new GetCalendar();
+      String json = new HTTP().get(getCalendar.createGetCalendarURL("primary", accessToken));
+      JSONObject jsonObject = new HTTP().parseJSON(json);
+      String primary_id = (String) jsonObject.get("id");
+
+      
+      // UPDATE Start Day
+      int startDay = Integer.parseInt(request.getParameter("startDay"));
+      Gson g = new Gson();
+      json = g.toJson(startDay);
+      DB.updateTextProperty(primary_id, "startDay", json);
+
+
+      // UPDATE Start Week
+      int startWeek = Integer.parseInt(request.getParameter("startWeek"));
+      json = g.toJson(startWeek);
+      DB.updateTextProperty(primary_id, "startWeek", json);
+
+      // UPDATE Difficulty of schedule
+      int intensity = Integer.parseInt(request.getParameter("intensity"));
+      json = g.toJson(intensity);
+      DB.updateTextProperty(primary_id, "userEventsChoice", json);
+
+      // UPDATE Description
+      String user_description = request.getParameter("description");
+      json = g.toJson(user_description);
+      DB.updateTextProperty(primary_id, "description", user_description);
+
+      // UPDATE possible study session days
+      int studySessionDays = Integer.parseInt(request.getParameter("days"));
+      List<Integer> days = new ArrayList<Integer>();
+      days.add(1);
+      days.add(2);
+      days.add(3);
+      days.add(4);
+      days.add(5);
+      days.add(6); 
+      days.add(7);
+      if (studySessionDays == 1) {
+        days.clear();
+        days.add(1);
+        days.add(2);
+        days.add(3);
+        days.add(4);
+        days.add(5);
+      } else if (studySessionDays == 2) {
+        days.clear();
+        days.add(6); 
+        days.add(7);
+      } else if (studySessionDays == 3) {
+        days.clear();
+        String[] x = request.getParameterValues("cd"); 
+        for (String s: x) {           
+          if (s.equals("sunday")) {
+            days.add(7);
+          } else if (s.equals("monday")) {
+            days.add(1);
+          } else if (s.equals("tuesday")) {
+            days.add(2);
+          } else if (s.equals("wednesday")) {
+            days.add(3);
+          } else if (s.equals("thursday")) {
+            days.add(4);
+          } else if (s.equals("friday")) {
+            days.add(5);
+          } else {
+            days.add(6);
+          }
+        }
+      }
+      json = g.toJson(days);
+      DB.updateTextProperty(primary_id, "onDays", json);
+
+      // UPDATE possible start times for events
+      String startTimes = request.getParameter("times");
+      List<List<Integer>> startTime = processStartTimes(startTimes);
+      json = g.toJson(startTime);
+      DB.updateTextProperty(primary_id, "start", json);
+
+      // UPDATE DURATION of events
+      String duration = request.getParameter("durations");
+      List<List<Integer>> study_session_length = processDuration(duration);
+      json = g.toJson(study_session_length);
+      DB.updateTextProperty(primary_id, "length", json);
+
+      // UPDATE Event Look Span
+      int span = Integer.parseInt(request.getParameter("span"));
+      json = g.toJson(span);
+      DB.updateTextProperty(primary_id, "eventLookSpan", json);
+      
+
+      // UPDATE Start Recurrence Length
+      int recurLength = Integer.parseInt(request.getParameter("recurrenceLength"));
+      json = g.toJson(recurLength);
+      DB.updateTextProperty(primary_id, "eventRecurrenceLength", json);
+
+      // UPDATE Overlapping Events
+      Boolean overlappingEvents = Boolean.valueOf(request.getParameter("overlapping"));
+      json = g.toJson(overlappingEvents);
+      DB.updateTextProperty(primary_id, "deleteOverlappingEvents", json);
+      
+
+      response.sendRedirect("/home.html");
+    } catch (Exception e) {
+      System.out.println("Failed to update settings because of: " + e);
     }
   }
 
@@ -190,7 +303,6 @@ public final class ScheduleHandlerServlet extends HttpServlet {
                         .replaceAll("p", "").replaceAll("m", "");
         
         int numMin = Integer.parseInt(minute);
-        //minute = minute.replace("\\/[a-zA-Z]+/g", "");
 
         possibleTimes.add(new ArrayList<Integer>(Arrays.asList(numHour, numMin)));
       }
@@ -225,7 +337,7 @@ public final class ScheduleHandlerServlet extends HttpServlet {
       while (n.find()) {
         if (count == 2) break;
         try {
-          int timeValue = Integer.parseInt(n.group());
+          int timeValue = Integer.parseInt(n.group().trim());
           if (count == 0) {
             hour = timeValue;
             hourSet = true;
