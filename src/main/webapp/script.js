@@ -177,8 +177,8 @@ function createCalendarIFrame(src) {
     /*color=%23039BE5&amp;color=%237986CB*/
     iFrameElement.src = decoded;
     iFrameElement.style = "border:solid 1px #777";
-    iFrameElement.width = "600"; /*"800";*/
-    iFrameElement.height = "750"; /*"600";*/
+    iFrameElement.width = "600";
+    iFrameElement.height = "750";
     iFrameElement.frameborder = "0";
     iFrameElement.scrolling = "no";
     return iFrameElement;
@@ -211,7 +211,7 @@ async function getResourcesForCalendar(searchKeyword) {
   console.log(numberOfVideos);
 }
 
-// RESOURCES RETRIEVAL *****************************************************************
+// Fetch the Book resource data from BookServlet to post on Home page
 function getResources() {
   console.log("Good news! You're getting resources!");
   var i;
@@ -244,7 +244,7 @@ function createHyperLink(link) {
 
 
 
-// RESOURCES TAB
+// Handle Book Link Display on Home Page using Tabs
 
 function openResource(evt, pageName) {
   var i, tabcontent, tablinks;

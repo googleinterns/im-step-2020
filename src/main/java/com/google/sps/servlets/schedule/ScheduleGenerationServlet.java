@@ -265,7 +265,7 @@ public class ScheduleGenerationServlet extends HttpServlet {
     DateTime timeToTryEnd = null;
 
     List<DateTime> listOfValidTimes = new ArrayList<DateTime>();
-
+/*
     // Start with the max duration
     for (Map.Entry<Integer,Integer> entry : USER.STUDY_SESSION_LENGTH.entrySet())  {
 
@@ -315,6 +315,7 @@ public class ScheduleGenerationServlet extends HttpServlet {
           }
       }
     }
+    */
     
     return listOfValidTimes;
   }

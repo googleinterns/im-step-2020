@@ -18,7 +18,7 @@ div {
 
 /* Text selection color */
 ::selection {
-  background: #a7aba7; /* WebKit/Blink Browsers */
+  background: #a7aba7;
 }
 
 h1 {
@@ -65,9 +65,10 @@ b {
 }
 
 h2 {
-  color: rgb(101, 129, 93);
-  /*-webkit-text-stroke-width: 1px; 
-  -webkit-text-stroke-color: whitesmoke;*/ 
+  color: #c5a2a2;
+  
+  -webkit-text-stroke-width: 1px; 
+  -webkit-text-stroke-color: whitesmoke;
 }
 
 /* Input */
@@ -177,7 +178,7 @@ ul.topnav li a {
 
 ul.topnav li a:hover:not(.active) {background-color: #111;}
 
-ul.topnav li a.active {background-color: ##728678;}
+ul.topnav li a.active {background-color: #927878;}
 
 ul.topnav li.right {float: right;}
 
