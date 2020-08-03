@@ -14,6 +14,7 @@
 
 package com.google.sps.servlets;
 
+import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,20 +40,39 @@ import org.json.simple.parser.ParseException;
 /** Servlet that sends Calendar settings. */
 @WebServlet("/get-calendar-settings")
 public final class GetCalendarSettingsServlet extends HttpServlet {
-    private UserPreferences USER = new UserPreferences();
 
   @Override
   /** This can be extended to send other settings. */
   public void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws IOException {
+    // Grab access token and make sure it's valid!
+    String accessToken = (String) request.getSession(false).getAttribute("access_token");
+    if (!new HTTP().isAccessTokenValid(accessToken)) {
+      response.sendRedirect("/request-permission");
+      return;
+    }
+
     // Grab session
     String searchKeyword = (String) request.getParameter("searchKeyword");
     request.getSession().setAttribute("searchKeyword", searchKeyword);
-    System.out.println(searchKeyword);
 
-    // Perform simple calculation of videos
-    int videos = USER.USER_EVENTS_CHOICE * USER.EVENT_RECURRENCE_LENGTH;
-    if (videos > 50) videos = 50; // enforce video limit
+    // Get primary ID
+    GetCalendar getCalendar = new GetCalendar();
+    String json = new HTTP().get(getCalendar.createGetCalendarURL("primary", accessToken));
+    JSONObject jsonObject = new HTTP().parseJSON(json);
+    String primary_id = (String) jsonObject.get("id");
+
+    // Get event recurrence
+    String eventRecurrenceLengthJSON = new Datastore().getUserSetting(primary_id, "eventRecurrenceLength");
+    Integer eventRecurrenceLength = new Gson().fromJson(eventRecurrenceLengthJSON, Integer.class);
+
+    // Get study intensity
+    String userEventsChoiceJSON = new Datastore().getUserSetting(primary_id, "userEventsChoice");
+    Integer userEventsChoice = new Gson().fromJson(userEventsChoiceJSON, Integer.class);
+
+    // Perform simple calculation of videos to query for
+    int videos = userEventsChoice * eventRecurrenceLength;
+    if (videos > 50) videos = 45; // enforce video limit
 
 
     JSONObject sendJSON = new JSONObject();

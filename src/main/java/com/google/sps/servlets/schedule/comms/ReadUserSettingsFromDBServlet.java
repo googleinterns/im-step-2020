@@ -99,30 +99,19 @@ public class ReadUserSettingsFromDBServlet extends HttpServlet {
     JSONObject sendJSON = new JSONObject();
     try {
       response.setContentType("application/json");
-      String description = DB.getUserSetting(primary_id, "description");
-      String eventLookSpan = DB.getUserSetting(primary_id, "eventLookSpan");
-      String eventRecurrenceLength = DB.getUserSetting(primary_id, "eventRecurrenceLength");
-      String length = DB.getUserSetting(primary_id, "length");
-      String notes = DB.getUserSetting(primary_id, "notes");
-      String onDays = DB.getUserSetting(primary_id, "onDays");
-      String start = DB.getUserSetting(primary_id, "start");
-      String startDay = DB.getUserSetting(primary_id, "startDay");
-      String startWeek = DB.getUserSetting(primary_id, "startWeek");
-      String userEventsChoice = DB.getUserSetting(primary_id, "userEventsChoice");
-      String deleteOverlappingEvents = DB.getUserSetting(primary_id, "deleteOverlappingEvents");
 
       List<String> settings = new ArrayList<String>() {{
-        add(description);
-        add(eventLookSpan);
-        add(eventRecurrenceLength);
-        add(length);
-        add(notes);
-        add(onDays);
-        add(start);
-        add(startDay);
-        add(startWeek);
-        add(userEventsChoice);
-        add(deleteOverlappingEvents);
+        add(DB.getUserSetting(primary_id, "description"));
+        add(DB.getUserSetting(primary_id, "eventLookSpan"));
+        add(DB.getUserSetting(primary_id, "eventRecurrenceLength"));
+        add(DB.getUserSetting(primary_id, "length"));
+        add(DB.getUserSetting(primary_id, "notes"));
+        add(DB.getUserSetting(primary_id, "onDays"));
+        add(DB.getUserSetting(primary_id, "start"));
+        add(DB.getUserSetting(primary_id, "startDay"));
+        add(DB.getUserSetting(primary_id, "startWeek"));
+        add(DB.getUserSetting(primary_id, "userEventsChoice"));
+        add(DB.getUserSetting(primary_id, "deleteOverlappingEvents"));
       }};
 
       sendJSON.put("settings", settings);
