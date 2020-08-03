@@ -54,6 +54,19 @@ import org.json.simple.parser.ParseException;
 @WebServlet("/getSettingsState")
 public class ReadUserSettingsFromDBServlet extends HttpServlet {
   private Datastore DB = new Datastore();
+  private List<String> userSettings = new ArrayList<String>() {{
+    add("description");
+    add("eventLookSpan");
+    add("eventRecurrenceLength");
+    add("length");
+    add("notes");
+    add("onDays");
+    add("start");
+    add("startDay");
+    add("startWeek");
+    add("userEventsChoice");
+    add("deleteOverlappingEvents");
+  }};
 
   @Override
   /** doGet
@@ -100,19 +113,12 @@ public class ReadUserSettingsFromDBServlet extends HttpServlet {
     try {
       response.setContentType("application/json");
 
-      List<String> settings = new ArrayList<String>() {{
-        add(DB.getUserSetting(primary_id, "description"));
-        add(DB.getUserSetting(primary_id, "eventLookSpan"));
-        add(DB.getUserSetting(primary_id, "eventRecurrenceLength"));
-        add(DB.getUserSetting(primary_id, "length"));
-        add(DB.getUserSetting(primary_id, "notes"));
-        add(DB.getUserSetting(primary_id, "onDays"));
-        add(DB.getUserSetting(primary_id, "start"));
-        add(DB.getUserSetting(primary_id, "startDay"));
-        add(DB.getUserSetting(primary_id, "startWeek"));
-        add(DB.getUserSetting(primary_id, "userEventsChoice"));
-        add(DB.getUserSetting(primary_id, "deleteOverlappingEvents"));
-      }};
+      List<String> settings = new ArrayList<String>();
+
+      for (String setting : userSettings) {
+        settings.add(DB.getUserSetting(primary_id, setting));
+      }
+      
 
       sendJSON.put("settings", settings);
       response.getWriter().print(sendJSON);
