@@ -267,11 +267,12 @@ public class ScheduleGenerationServlet extends HttpServlet {
     List<DateTime> listOfValidTimes = new ArrayList<DateTime>();
 
     // Start with the max duration
-    for (Map.Entry<Integer,Integer> entry : USER.STUDY_SESSION_LENGTH.entrySet())  {
+    
+    for (List<Integer> entry : USER.STUDY_SESSION_LENGTH)  {
 
       // Loop through specific study session start times and see if one works.
-      for (Map.Entry<Integer,Integer> time : USER.STUDY_SESSION_START_TIME.entrySet()) {
-        timeToTry = timeToTry.withZone(DateTimeZone.forID(TIME.timezone)).withHourOfDay(time.getKey()).withMinuteOfHour(time.getValue()).withSecondOfMinute(0);
+      for (List<Integer> time : USER.STUDY_SESSION_START_TIME) {
+        timeToTry = timeToTry.withZone(DateTimeZone.forID(TIME.timezone)).withHourOfDay(time.get(0)).withMinuteOfHour(time.get(1)).withSecondOfMinute(0);
         System.out.println(timeToTry);
 
         // Check that we have not already gone past the time we are trying to schedule!
@@ -280,7 +281,7 @@ public class ScheduleGenerationServlet extends HttpServlet {
         // Start with the max duration
           Boolean foundOverlap = false;
           // Get duration of starttime
-          timeToTryEnd = timeToTry.plusHours(entry.getKey()).plusMinutes(entry.getValue());
+          timeToTryEnd = timeToTry.plusHours(entry.get(0)).plusMinutes(entry.get(1));
           Interval studySession = new Interval(timeToTry, timeToTryEnd);
 
           Iterator i = array.iterator();

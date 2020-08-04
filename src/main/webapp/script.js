@@ -212,7 +212,7 @@ async function getResourcesForCalendar(searchKeyword) {
   console.log(numberOfVideos);
 }
 
-
+// Jest Testing  in script.js file
 
 if (typeof exports !== undefined) {
   module.exports = {getSrcLastString}

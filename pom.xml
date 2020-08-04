@@ -138,7 +138,7 @@
       </plugin>
       
       <!--To incorporate Jest tests into maven build-->
-      <plugin>
+      <!--plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
         <version>1.10.0</version>
@@ -181,7 +181,7 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
+      </plugin-->
     </plugins>
   </build>
 </project>
