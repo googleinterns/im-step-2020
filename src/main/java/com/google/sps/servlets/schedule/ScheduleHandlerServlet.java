@@ -197,20 +197,12 @@ public final class ScheduleHandlerServlet extends HttpServlet {
       // UPDATE possible study session days
       int studySessionDays = Integer.parseInt(request.getParameter("days"));
       List<Integer> days = new ArrayList<Integer>();
-      days.add(1);
-      days.add(2);
-      days.add(3);
-      days.add(4);
-      days.add(5);
-      days.add(6); 
-      days.add(7);
+      for (int i = 1; i <= 7; i++)
+        days.add(i);
       if (studySessionDays == 1) {
         days.clear();
-        days.add(1);
-        days.add(2);
-        days.add(3);
-        days.add(4);
-        days.add(5);
+        for (int i = 1; i <= 5; i++)
+          days.add(i);
       } else if (studySessionDays == 2) {
         days.clear();
         days.add(6); 
