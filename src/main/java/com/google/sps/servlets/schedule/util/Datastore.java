@@ -33,8 +33,7 @@ public class Datastore {
 
     // Adds a user in case we don't have them in database
     public void manageUserSettings(String primary_id) {
-        if (getUser(primary_id) == null) 
-            addUser(primary_id);
+        if (getUser(primary_id) == null) addUser(primary_id);
     }
 
     // Applies default settings to user
@@ -75,8 +74,6 @@ public class Datastore {
             json = g.toJson(STUDY_SESSION_LENGTH);
             user.setProperty("length", json);
 
-
-
             user.setProperty("onDays", "[1,2,3,4,5,6,7]");
             user.setProperty("resources", "");
             user.setProperty("eventLookSpan", "7");
@@ -86,10 +83,6 @@ public class Datastore {
 
             user.setProperty("notes", "");
             datastore.put(user);
-
-            
-    
-            
         } catch (Exception e) {
             System.out.println("Unable to apply default properties because of: " + e);
         }

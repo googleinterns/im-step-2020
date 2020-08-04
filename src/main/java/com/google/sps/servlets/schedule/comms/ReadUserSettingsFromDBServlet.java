@@ -54,6 +54,19 @@ import org.json.simple.parser.ParseException;
 @WebServlet("/getSettingsState")
 public class ReadUserSettingsFromDBServlet extends HttpServlet {
   private Datastore DB = new Datastore();
+  private List<String> userSettings = new ArrayList<String>() {{
+    add("description");
+    add("eventLookSpan");
+    add("eventRecurrenceLength");
+    add("length");
+    add("notes");
+    add("onDays");
+    add("start");
+    add("startDay");
+    add("startWeek");
+    add("userEventsChoice");
+    add("deleteOverlappingEvents");
+  }};
 
   @Override
   /** doGet
@@ -99,31 +112,13 @@ public class ReadUserSettingsFromDBServlet extends HttpServlet {
     JSONObject sendJSON = new JSONObject();
     try {
       response.setContentType("application/json");
-      String description = DB.getUserSetting(primary_id, "description");
-      String eventLookSpan = DB.getUserSetting(primary_id, "eventLookSpan");
-      String eventRecurrenceLength = DB.getUserSetting(primary_id, "eventRecurrenceLength");
-      String length = DB.getUserSetting(primary_id, "length");
-      String notes = DB.getUserSetting(primary_id, "notes");
-      String onDays = DB.getUserSetting(primary_id, "onDays");
-      String start = DB.getUserSetting(primary_id, "start");
-      String startDay = DB.getUserSetting(primary_id, "startDay");
-      String startWeek = DB.getUserSetting(primary_id, "startWeek");
-      String userEventsChoice = DB.getUserSetting(primary_id, "userEventsChoice");
-      String deleteOverlappingEvents = DB.getUserSetting(primary_id, "deleteOverlappingEvents");
 
-      List<String> settings = new ArrayList<String>() {{
-        add(description);
-        add(eventLookSpan);
-        add(eventRecurrenceLength);
-        add(length);
-        add(notes);
-        add(onDays);
-        add(start);
-        add(startDay);
-        add(startWeek);
-        add(userEventsChoice);
-        add(deleteOverlappingEvents);
-      }};
+      List<String> settings = new ArrayList<String>();
+
+      for (String setting : userSettings) {
+        settings.add(DB.getUserSetting(primary_id, setting));
+      }
+      
 
       sendJSON.put("settings", settings);
       response.getWriter().print(sendJSON);
