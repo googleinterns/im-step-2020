@@ -118,7 +118,7 @@ public class YouTubeServlet extends HttpServlet{
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         // Define and execute the API request
         YouTube.Search.List api_request = youtubeService.search().list("snippet");
-        
+
         // Check if we need to requery the same term
         if (currentSearchTerm.equals(previousSearchTerm)) {
           System.out.println("Do not query again: YouTube Servlet");

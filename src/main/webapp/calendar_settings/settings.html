@@ -7,11 +7,15 @@
         <title>Calendar Settings</title>
         <link rel="stylesheet" href="settings.css">
     </head>
-
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <body>
-        <a href="/home.html">Go back</a>
-        <h1>Let's customize your schedule...</h1><hr>
-
+        <ul class="topnav">
+            <li><a class="active" href="/home.html">Home</a></li>
+            <li><a href="/guide.html">Guide</a></li>
+            <li><a href="#">Settings</a></li>
+            <li class="right"><a href="/feedback.html">Feedback</a></li>
+        </ul>
+        
         <form class="form" action="/schedule-handler" method="GET" id="settings">
             <input type="hidden" id="saveSettings" name="saveSettings" value="0">
 

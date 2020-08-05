@@ -49,6 +49,7 @@ public class YouTubeServletTest extends Mockito {
       Our test input is a string containing the number 5.
       Testing: YouTubeServlet.doPost()
     */
+
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
     HttpSession session = mock(HttpSession.class);
@@ -76,6 +77,7 @@ public class YouTubeServletTest extends Mockito {
       
       Testing: YouTubeServlet.doGet()
     */
+
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
     HttpSession session = mock(HttpSession.class);
@@ -100,4 +102,5 @@ public class YouTubeServletTest extends Mockito {
     System.out.println("Fetched: " + stringWriter.toString().replaceAll(" ", ""));
     assertEquals(true, stringWriter.toString().replaceAll(" ", "").contains(expected.toString().replaceAll(" ", "")));
   }
+
 }
