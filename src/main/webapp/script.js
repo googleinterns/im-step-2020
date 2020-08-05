@@ -13,12 +13,27 @@
 // limitations under the License.
 
 
+var numVideos = 0;
+var resourceSearchTerm;
+
+function waitUntilScheduleGenerates() {
+  // Allows for the schedule to generate before calling getVideoResults()
+  if (event.keyCode == 13) {
+    console.log("Waiting...");
+    window.setTimeout(getVideoResults, 5000);
+    window.setTimeout(getResources, 5000);
+  }
+}
+
+// Utilize for scheduling videos and embedding videos
 function getVideoResults() {
-  var i;
-  let directUrls = []
-  const dataListElement = document.getElementById('videoResults');
+  var i; // Iterate over the array indexes
+  let directUrls = [] // URLs to be put on the schedule
+  const dataListElement = document.getElementById('videoResults'); // Location to embed videos on the page
   dataListElement.innerHTML = '';
-  sendNumOfVideos(5) // <<<<<<<<<<<<<< Payton's logic instead of 5
+  
+  // Anytime we fetch with this function we will be grabbing from the current page
+  sendNumOfVideos([new Number(numVideos), new Boolean(false)]) 
   fetch('/videoQuery').then(response => response.json()).then((data) => {
     if (dataListElement.innerHTML == '') {
       for (i=0; i<data.length; i++) {
@@ -26,8 +41,7 @@ function getVideoResults() {
         if (i % 2 == 0) {
           console.log("Embed", data[i]);
           // Send embedded links to iframes on index.html
-          dataListElement.appendChild(
-            createIFrame(data[i]));
+          dataListElement.appendChild(createIFrame(data[i]));
         }
         else {
           console.log("Direct", data[i]);
@@ -36,7 +50,29 @@ function getVideoResults() {
         }
       }
     }
+    // Send direct URLs to be scheduled
     sendURLsToEvents(directUrls);
+  });
+}
+
+// Utilize to embed different videos that are NOT scheduled
+function getMoreVideos() {
+  var i;
+  const dataListElement = document.getElementById('videoResults');
+  dataListElement.innerHTML = '';
+  // Anytime we fetch with this function we will be grabbing from the next page
+  sendNumOfVideos([new Number(numVideos), new Boolean(true)]) 
+  fetch('/videoQuery').then(response => response.json()).then((data) => {
+    if (dataListElement.innerHTML == '') {
+      for (i=0; i<data.length; i++) {
+        // Even URLs are embedded, Odd are Direct URLs
+        if (i % 2 == 0) {
+          console.log("Embed", data[i]);
+          // Send embedded links to iframes on index.html
+          dataListElement.appendChild(createIFrame(data[i]));
+        }
+      }
+    }
   });
 }
 
@@ -192,7 +228,6 @@ function setSearchInput(event) {
     if (confirm("Are you sure you would like to generate a schedule for '" + searchTerm + "'?")) {
       getResourcesForCalendar(searchTerm);
       input.value = ""; // User confirmed request. 
-      getVideoResults();
       console.log("Schedule Generated!");
     } else {
       input.value = searchTerm; // User canceled.
@@ -208,6 +243,7 @@ async function getResourcesForCalendar(searchKeyword) {
 
   // Grab number of videos
   const numberOfVideos = resourceInformation.numberOfVideos;
+  numVideos = numberOfVideos;
   console.log(numberOfVideos);
 }
 
@@ -217,8 +253,12 @@ function getResources() {
   var i;
   var page = 1;
   var dataListElement = document.getElementById('Page'+page);
-  dataListElement.innerHTML = '';
-  fetch('/bookResults').then(response => response.json()).then((data) => {
+  for (i=1; i < 6; i++) {
+    dataListElement = document.getElementById('Page'+i);
+    dataListElement.innerHTML = '';
+  }
+  fetch('/bookQuery').then(response => response.json()).then((data) => {
+    console.log(data);
     if (dataListElement.innerHTML == '') {
       for (i=0; i<data.length; i++) {
         if(i%5 == 0){
@@ -235,10 +275,10 @@ function getResources() {
 
 function createHyperLink(link) {
   const aElement = document.createElement('a');
-  var linkText = document.createTextNode(link);
+  var linkText = document.createTextNode(link.Title);
   aElement.appendChild(linkText);
-  aElement.title = link;
-  aElement.href = link;
+  aElement.title = link.Title;
+  aElement.href = link.URL;
   return aElement;
 }
 
