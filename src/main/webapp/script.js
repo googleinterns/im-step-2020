@@ -84,7 +84,6 @@ async function sendNumOfVideos(num) {
   }
 }
 
-
 function createIFrame(text) {
   const iFrameElement = document.createElement('iframe');
   iFrameElement.src = text;
@@ -175,11 +174,11 @@ function createCalendarIFrame(src) {
 
     var decoded = src.replace(/&amp;/g, '&');
 
-/*color=%23039BE5&amp;color=%237986CB*/
+    /*color=%23039BE5&amp;color=%237986CB*/
     iFrameElement.src = decoded;
     iFrameElement.style = "border:solid 1px #777";
-    iFrameElement.width = "800";
-    iFrameElement.height = "600";
+    iFrameElement.width = "600";
+    iFrameElement.height = "750";
     iFrameElement.frameborder = "0";
     iFrameElement.scrolling = "no";
     return iFrameElement;
@@ -210,4 +209,56 @@ async function getResourcesForCalendar(searchKeyword) {
   // Grab number of videos
   const numberOfVideos = resourceInformation.numberOfVideos;
   console.log(numberOfVideos);
+}
+
+// Fetch the Book resource data from BookServlet to post on Home page
+function getResources() {
+  console.log("Good news! You're getting resources!");
+  var i;
+  var page = 1;
+  var dataListElement = document.getElementById('Page'+page);
+  dataListElement.innerHTML = '';
+  fetch('/bookResults').then(response => response.json()).then((data) => {
+    if (dataListElement.innerHTML == '') {
+      for (i=0; i<data.length; i++) {
+        if(i%5 == 0){
+            dataListElement = document.getElementById('Page'+ page++);
+        }
+        dataListElement.appendChild(
+          createHyperLink(data[i]));
+        console.log("LINK RETRIEVED: " + data[i]);
+        dataListElement.appendChild(document.createElement('br'));
+      }
+    }
+  });
+}
+
+function createHyperLink(link) {
+  const aElement = document.createElement('a');
+  var linkText = document.createTextNode(link);
+  aElement.appendChild(linkText);
+  aElement.title = link;
+  aElement.href = link;
+  return aElement;
+}
+
+
+
+// Handle Book Link Display on Home Page using Tabs
+
+function openResource(evt, pageName) {
+  var i, tabcontent, tablinks;
+  // Get all elements with class="tabcontent" and hide them
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  // Get all elements with class="tablinks" and remove the class "active"
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  // Show the current tab, and add an "active" class to the button that opened the tab
+  document.getElementById(pageName).style.display = "block";
+  evt.currentTarget.className += " active";
 }

@@ -3,5 +3,9 @@
 target/
 yt-key.txt
 books-key.txt
+<<<<<<< HEAD
+secret.txt
+=======
 secret.txt
 
+>>>>>>> 16455bf7ccaabf7534ae3b62bcc03fa66a351147

@@ -6,12 +6,11 @@ html {
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
+  font-size: 20px;
 }
 
 body {
-    color: black;
     font-family: 'Open Sans', sans-serif;
-    font-size: 30px;
 }
 
 div {
@@ -23,14 +22,27 @@ div {
 h1 {
   font-family: 'Open Sans', sans-serif;
   font-size: 80px;
+  color: #f1f1f1;
+}
+
+h2 {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 60px;
+  color: #f1f1f1;
+}
+
+h3 {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 17px;
+  color: #333;
 }
 
 p {
     padding: 0; margin: 0;
     font-family: 'Roboto', sans-serif;
     font-size: 30px;
+    color: #333;
 }
-
 
 input::placeholder {
   font-style: italic;
@@ -38,16 +50,80 @@ input::placeholder {
 }
 
 textarea { 
-    background-color: black;
-    color: white;
+    background-color: #ccc;
+    color: black;
 }
 
-.keywords-display {
-    font-size: 20px;
+/* Affects the Resources Tab */
+
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
 }
 
-.resources-display {
-    font-size: 20px;
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+.tab button:hover {
+  background-color: #ddd;
+}
+
+.tab button.active {
+  background-color: #ccc;
+}
+
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+/* Affects Navigation-Bar */
+body {margin: 0;}
+
+ul.topnav {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+ul.topnav li {float: left;}
+
+ul.topnav li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+ul.topnav li a:hover:not(.active) {background-color: #111;}
+
+ul.topnav li a.active {background-color: #c5a2a2;}
+
+ul.topnav li.right {float: right;}
+
+@media screen and (max-width: 600px) {
+  ul.topnav li.right, 
+  ul.topnav li {float: none;}
+}
+
+/* Affects Guide / Feedback Page */
+.user-guide, user-feedback {
+    display: center;
+    padding: 6px 12px;
 }
 
 /* Affects Flexbox-Grid */
@@ -56,19 +132,27 @@ textarea {
   display: flex;
   justify-content: center;
   align-content: space-between;
-  padding: 30px;
+  padding: 5px;
   max-height: 100vh;
 }
 
 .grid {
   display: grid;
   justify-content: center;
-  border: 1px solid black;
   grid-row-gap: 100px;
   grid-template-columns: 2fr 3fr 2fr;
   grid-template-rows: 2fr 3fr;
   grid-gap: 20px;
-  padding: 30px;
+  padding-top: 10px;
+}
+
+.keywords-display {
+    font-size: 20px;
+}
+
+.resources-display {
+    padding: 20px;
+    font-size: 20px;
 }
 
 .calendar-display{

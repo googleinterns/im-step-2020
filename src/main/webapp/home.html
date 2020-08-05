@@ -10,32 +10,83 @@
     </head>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Roboto&display=swap" rel="stylesheet">
     <body>
-        <body onload="displayCalendarHandler();">
+        <body onload="displayCalendarHandler(); getResources();">
+
+        <ul class="topnav">
+            <li><a class="active" href="#">Home</a></li>
+            <li><a href="/guide.html">Guide</a></li>
+            <li><a href="/calendar_settings/settings.html">Settings</a></li>
+            <li class="right"><a href="/feedback.html">Feedback</a></li>
+        </ul>
+
         <div class="wrapper">
             <div class="grid">
-                <div class="resources">
+                <div class="resources-display">
                     <p>Books n' Resources</p>
-                    <textarea class="resources-input" style="height:90%; width:90%; background-color:black;"></textarea>
+                    <div class="tab">
+                        <button class="tablinks" onclick="openResource(event, 'Links')" id="defaultOpen">Important Links</button>
+                        <button class="tablinks" onclick="openResource(event, 'Page1')">Page 1</button>
+                        <button class="tablinks" onclick="openResource(event, 'Page2')">Page 2</button>
+                        <button class="tablinks" onclick="openResource(event, 'Page3')">Page 3</button>
+                        <button class="tablinks" onclick="openResource(event, 'Page4')">Page 4</button>
+                        <button class="tablinks" onclick="openResource(event, 'Page5')">Page 5</button>
+                    </div>
+
+                    <div id="Links" class="tabcontent">
+                        <h3>Important Links</p>
+                        <h3><a href="https://www.w3.org/">W3Schools</a></h3>
+                        <h3><a href="https://www.python.org/">Python.org</a></h3>
+                        <h3><a href="https://www.learnpython.org/">LearnPython.org</a></h3>
+                        <h3><a href="https://wiki.python.org/moin/SimplePrograms">Simple Python Programs</a></h3>
+                        <h3><a href="https://www.geeksforgeeks.org/python-programming-examples/">Python Examples GfG</a></h3>
+                    </div>
+                    <div id="Page1" class="tabcontent">
+                        <div class="hrefs"></div>
+                    </div>
+                    <div id="Page2" class="tabcontent">
+                        <div class="hrefs"></div>
+                    </div>
+                    <div id="Page3" class="tabcontent">
+                        <div class="hrefs"></div>
+                    </div>
+                    <div id="Page4" class="tabcontent">
+                        <div class="hrefs"></div>
+                    </div>
+                    <div id="Page5" class="tabcontent">
+                        <div class="hrefs"></div>
+                    </div>
                 </div>
                 <div class="key-display">
-                    <h1>"I will learn..."</h1>
+                    <h2>"I will learn..."</h2>
                     <input onkeyup="setSearchInput(event);" class="keywords-input" type="search" name="keywords-input" placeholder="Python">
                     <br>
-                    <button onclick="getVideoResults()">Get the Videos</button>
                 </div>
                 <div class="learner-display">
                     <p>Learning Level</p>
-                    <textarea class="learner-input" style="height:90%; width:90%; background-color:black;"></textarea>
+                    <input type="radio" id="light" name="intensity" value="3" required checked>
+                    <label for="light">Light Intensity</label><br>
+
+                    <input type="radio" id="medium" name="intensity" value="4">
+                    <label for="medium">Medium Intensity</label><br>
+
+                    <input type="radio" id="hard" name="intensity" value="5">
+                    <label for="hard">Hard Intensity</label><br>
+
+                    <input type="radio" id="expert" name="intensity" value="6">
+                    <label for="expert">Expert Intensity</label><br><br>
                 </div>
                 <div class="calendar-display">
+                    <p>Study Schedule</p>
                     <div id="calendar-display"></div>
                 </div>
                 <div class="video-display">
+                    <p>Videos</p>
                     <div id="videoResults"></div>
+                    <button onclick="getVideoResults()">More Videos</button>
                 </div>
                 <div class="notes-display">
                     <p>Notes</p>
-                    <textarea class="notes-input" style="height:90%; width:90%; background-color:black;"></textarea>
+                    <textarea class="notes-input" style="height:90%; width:90%; background-color:#f1f1f1;"></textarea>
                 </div>
             </div>
         </div>
