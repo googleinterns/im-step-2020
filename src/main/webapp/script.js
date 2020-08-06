@@ -12,13 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var clicked = false;
+var videos = 5;
 
+var numVideos = 0;
+var resourceSearchTerm;
+
+function waitUntilScheduleGenerates() {
+  // Allows for the schedule to generate before calling getVideoResults()
+  if (event.keyCode == 13) {
+    console.log("Waiting...");
+    window.setTimeout(getVideoResults, 5000);
+    window.setTimeout(getResources, 5000);
+  }
+}
+
+// Utilize for scheduling videos and embedding videos
 function getVideoResults() {
-  var i;
-  let directUrls = []
-  const dataListElement = document.getElementById('videoResults');
+  var i; // Iterate over the array indexes
+  let directUrls = [] // URLs to be put on the schedule
+  const dataListElement = document.getElementById('videoResults'); // Location to embed videos on the page
   dataListElement.innerHTML = '';
-  sendNumOfVideos(5) // <<<<<<<<<<<<<< Payton's logic instead of 5
+  
+  // Anytime we fetch with this function we will be grabbing from the current page
+  sendNumOfVideos([new Number(numVideos), new Boolean(false)]) 
   fetch('/videoQuery').then(response => response.json()).then((data) => {
     if (dataListElement.innerHTML == '') {
       for (i=0; i<data.length; i++) {
@@ -26,8 +43,7 @@ function getVideoResults() {
         if (i % 2 == 0) {
           console.log("Embed", data[i]);
           // Send embedded links to iframes on index.html
-          dataListElement.appendChild(
-            createIFrame(data[i]));
+          dataListElement.appendChild(createIFrame(data[i]));
         }
         else {
           console.log("Direct", data[i]);
@@ -36,7 +52,29 @@ function getVideoResults() {
         }
       }
     }
+    // Send direct URLs to be scheduled
     sendURLsToEvents(directUrls);
+  });
+}
+
+// Utilize to embed different videos that are NOT scheduled
+function getMoreVideos() {
+  var i;
+  const dataListElement = document.getElementById('videoResults');
+  dataListElement.innerHTML = '';
+  // Anytime we fetch with this function we will be grabbing from the next page
+  sendNumOfVideos([new Number(numVideos), new Boolean(true)]) 
+  fetch('/videoQuery').then(response => response.json()).then((data) => {
+    if (dataListElement.innerHTML == '') {
+      for (i=0; i<data.length; i++) {
+        // Even URLs are embedded, Odd are Direct URLs
+        if (i % 2 == 0) {
+          console.log("Embed", data[i]);
+          // Send embedded links to iframes on index.html
+          dataListElement.appendChild(createIFrame(data[i]));
+        }
+      }
+    }
   });
 }
 
@@ -106,7 +144,7 @@ async function displayCalendarHandler() {
         displayCalendar(data.main, data.study, data.timezone);
     }
     catch (e) {
-        console.log("Calendar IDs fetch failed");
+        console.log("Calendar IDs fetch failed! " + e);
     }
 }
 
@@ -189,10 +227,10 @@ function setSearchInput(event) {
   const input = document.getElementsByName("keywords-input");
   if (event.keyCode === 13) {
     const searchTerm = event.target.value.replace(/\n/g, "").trim();
+    if (searchTerm === "") return;
     if (confirm("Are you sure you would like to generate a schedule for '" + searchTerm + "'?")) {
-      getResourcesForCalendar(searchTerm);
       input.value = ""; // User confirmed request. 
-      getVideoResults();
+      generateSchedule(searchTerm);
       console.log("Schedule Generated!");
     } else {
       input.value = searchTerm; // User canceled.
@@ -200,15 +238,24 @@ function setSearchInput(event) {
   }
 }
 
-// This function passes important information to ResourceServlets to get resources. Then simply calls ScheduleGeneration.
-async function getResourcesForCalendar(searchKeyword) {
+// This function passes important information to ResourceServlets to get resource information.
+async function generateSchedule(searchKeyword) {
   // Grab current Calendar settings relevant to generate the schedule
-  const response = await fetch(`/get-calendar-settings?searchKeyword=${searchKeyword}`);
+  var response = await fetch(`/get-calendar-settings?searchKeyword=${searchKeyword}`);
   const resourceInformation = await response.json();
 
-  // Grab number of videos
+  // Grab number of videos and set them
   const numberOfVideos = resourceInformation.numberOfVideos;
+  numVideos = numberOfVideos;
   console.log(numberOfVideos);
+  getVideoResults();
+
+  // Get relevant video results.
+  document.getElementById("loader").style.visibility = "visible";
+  console.log("Waiting for schedule to finish!")
+  response = await fetch(`/schedule-handler?generate=true`);
+  console.log("Finished generating the schedule!");
+  document.getElementById("loader").style.visibility = "hidden";
 }
 
 // Fetch the Book resource data from BookServlet to post on Home page
@@ -217,8 +264,12 @@ function getResources() {
   var i;
   var page = 1;
   var dataListElement = document.getElementById('Page'+page);
-  dataListElement.innerHTML = '';
-  fetch('/bookResults').then(response => response.json()).then((data) => {
+  for (i=1; i < 6; i++) {
+    dataListElement = document.getElementById('Page'+i);
+    dataListElement.innerHTML = '';
+  }
+  fetch('/bookQuery').then(response => response.json()).then((data) => {
+    console.log(data);
     if (dataListElement.innerHTML == '') {
       for (i=0; i<data.length; i++) {
         if(i%5 == 0){
@@ -235,10 +286,10 @@ function getResources() {
 
 function createHyperLink(link) {
   const aElement = document.createElement('a');
-  var linkText = document.createTextNode(link);
+  var linkText = document.createTextNode(link.Title);
   aElement.appendChild(linkText);
-  aElement.title = link;
-  aElement.href = link;
+  aElement.title = link.Title;
+  aElement.href = link.URL;
   return aElement;
 }
 
@@ -261,4 +312,40 @@ function openResource(evt, pageName) {
   // Show the current tab, and add an "active" class to the button that opened the tab
   document.getElementById(pageName).style.display = "block";
   evt.currentTarget.className += " active";
+}
+
+async function setLearningLevel() {
+  const ele = document.getElementsByName("intensity"); 
+              
+  for (var i = 0; i < ele.length; i++) { 
+    if (ele[i].checked) {
+      const response = await fetch(`/updateLearningLevel?set=true&level=${ele[i].value}`);
+      const data = await response.json();
+    }
+  } 
+}
+
+async function getLearningLevel() {
+  const ele = document.getElementsByName("intensity"); 
+  const notes = document.getElementById("notes");
+  const response = await fetch(`/updateLearningLevel?set=false&setNotes=false&level=-1`);
+  const data = await response.json();
+
+  for (var i = 0; i < ele.length; i++) { 
+    if (ele[i].value === data.level) {
+      ele[i].checked = true;
+    }
+  } 
+  notes.value = data.notes;
+}
+
+async function setNotes() {
+  const notes = document.getElementById("notes");
+  const response = await fetch(`/updateLearningLevel?set=false&setNotes=true&notes=${notes.value}`);
+}
+
+function delay() {
+    var timer = null;
+    clearTimeout(timer); 
+    timer = setTimeout(setNotes, 1000)
 }

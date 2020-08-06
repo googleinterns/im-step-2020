@@ -10,7 +10,7 @@
     </head>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Roboto&display=swap" rel="stylesheet">
     <body>
-        <body onload="displayCalendarHandler(); getResources();">
+        <body onload="getLearningLevel(); displayCalendarHandler(); getResources();">
 
         <ul class="topnav">
             <li><a class="active" href="#">Home</a></li>
@@ -58,21 +58,22 @@
                 </div>
                 <div class="key-display">
                     <h2>"I will learn..."</h2>
-                    <input onkeyup="setSearchInput(event);" class="keywords-input" type="search" name="keywords-input" placeholder="Python">
+                    <input onkeyup="setSearchInput(event); waitUntilScheduleGenerates();" class="keywords-input" type="search" name="keywords-input" placeholder="Python">
+                    <div id="loader" class="loader"></div>
                     <br>
                 </div>
                 <div class="learner-display">
                     <p>Learning Level</p>
-                    <input type="radio" id="light" name="intensity" value="3" required checked>
+                    <input type="radio" id="light" name="intensity" value="3" required checked onchange="setLearningLevel()">
                     <label for="light">Light Intensity</label><br>
 
-                    <input type="radio" id="medium" name="intensity" value="4">
+                    <input type="radio" id="medium" name="intensity" value="4" onchange="setLearningLevel()">
                     <label for="medium">Medium Intensity</label><br>
 
-                    <input type="radio" id="hard" name="intensity" value="5">
+                    <input type="radio" id="hard" name="intensity" value="5" onchange="setLearningLevel()">
                     <label for="hard">Hard Intensity</label><br>
 
-                    <input type="radio" id="expert" name="intensity" value="6">
+                    <input type="radio" id="expert" name="intensity" value="6" onchange="setLearningLevel()">
                     <label for="expert">Expert Intensity</label><br><br>
                 </div>
                 <div class="calendar-display">
@@ -82,11 +83,11 @@
                 <div class="video-display">
                     <p>Videos</p>
                     <div id="videoResults"></div>
-                    <button onclick="getVideoResults()">More Videos</button>
+                    <button onclick="getMoreVideos()">More Videos</button>
                 </div>
                 <div class="notes-display">
                     <p>Notes</p>
-                    <textarea class="notes-input" style="height:90%; width:90%; background-color:#f1f1f1;"></textarea>
+                    <textarea id="notes" class="notes-input" style="height:90%; width:90%; background-color:#f1f1f1;" onkeyup="delay()"></textarea>
                 </div>
             </div>
         </div>
