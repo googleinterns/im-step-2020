@@ -27,18 +27,34 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 
 public class YouTubeServletTest extends Mockito {
 
+  private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig(),
+            new LocalTaskQueueTestConfig(),
+            new LocalBlobstoreServiceTestConfig(),
+            new LocalUserServiceTestConfig());
+
+  @Before
+  public void setUp() {
+    helper.setUp();
+  }
+
+  @After
+  public void tearDown() {
+    helper.tearDown();
+  }
+
   @Test
   public void testdoPost() throws Exception {
     /*
-      This is a test to see we successfully take a string and parse an Integer and Boolean out of it.
-      Our test input is a string [5, false].
+      This is a test to see we successfully take a string and parse an Integer out of it.
+      Our test input is a string containing the number 5.
       Testing: YouTubeServlet.doPost()
     */
+
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
     HttpSession session = mock(HttpSession.class);
 
-    String json = "[5,false]";
+    String json = "5";
     // Set up rules for going through the servlet
     when(request.getSession(false)).thenReturn(session);
     when(request.getReader()).thenReturn(new BufferedReader(new StringReader(json)));
@@ -58,9 +74,10 @@ public class YouTubeServletTest extends Mockito {
   @Test
   public void testdoGet() throws Exception {
     /*
-      Testing that given the search keyword of "Python Programming", we receive 2 links, one embed and one direct.
+      
       Testing: YouTubeServlet.doGet()
     */
+
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
     HttpSession session = mock(HttpSession.class);
@@ -85,4 +102,5 @@ public class YouTubeServletTest extends Mockito {
     System.out.println("Fetched: " + stringWriter.toString().replaceAll(" ", ""));
     assertEquals(true, stringWriter.toString().replaceAll(" ", "").contains(expected.toString().replaceAll(" ", "")));
   }
+
 }

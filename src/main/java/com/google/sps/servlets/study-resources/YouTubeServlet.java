@@ -1,3 +1,8 @@
+/**
+ * Sample Java code for youtube.search.list
+ * See instructions for running these code samples locally:
+ * https://developers.google.com/explorer-help/guides/code_samples#java
+ */
 package com.google.sps.servlets;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -29,7 +34,7 @@ import java.io.InputStream;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.lang.*;
+import java.lang.Integer;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -41,26 +46,14 @@ import com.google.gson.*;
 public class YouTubeServlet extends HttpServlet{
     // Need Dev-Key to make an authorized search.
     // For example: ... DEVELOPER_KEY = "YOUR ACTUAL KEY";
-    private static boolean needNextPageToken = false;
-
-    private static String previousPageToken = "";
-    private static String previousSearchTerm = "";
-    private static String currentSearchTerm = "";
-    private static String nextPageToken = "";
-
-    private static int numVideos = 0;
-
-    
+    private static int NUM_VIDEOS = 0;
+    private static  String previousSearchTerm = "";
     private static String DEVELOPER_KEY = "";
-
-    private ArrayList<String> links = new ArrayList<String>();
-
-    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String APPLICATION_NAME = "First Time Coders";
+    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String EMBED_TEMP_LINK = "https://www.youtube.com/embed/";
     private static final String DIRECT_TEMP_LINK = "https://www.youtube.com/watch?v=";
-
-    
+    private ArrayList<String> links = new ArrayList<String>();
 
     public void init() {
       try {
@@ -70,7 +63,6 @@ public class YouTubeServlet extends HttpServlet{
           DEVELOPER_KEY = reader.readLine();
         }
         reader.close();
-        numVideos = 1;
         System.out.println("YouTube Servlet Init completed");
       } catch (Exception e) {
         System.out.println("Error: " + e);
@@ -93,28 +85,22 @@ public class YouTubeServlet extends HttpServlet{
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
       System.out.println("GET Request: YouTubeServlet");     
       try {
-        /* ----------- VARIABLES ----------- */
-        long results = 0;
-        String embedUrl = "";
-        String directUrl = "";
-        String videoTitle = "";
-        currentSearchTerm = (String) request.getSession(false).getAttribute("searchKeyword");
-        // Use for gathering video metadata
         YouTube youtubeService = getService();
-        ResourceId videoId = new ResourceId();
-        SearchResultSnippet videoInfoSnippet = new SearchResultSnippet();
-        
-        
-        // Safety Net: If we receive zero for number of videos
-        // from POST request, default to 1.
-        if (numVideos == 0) {
+        long results = 0;
+        if (NUM_VIDEOS == 0) {
           results = 1;
         } else {
-          results = numVideos;
+          results = NUM_VIDEOS;
         }
+        // Use for creating links
+        String embedUrl = "";
+        String directUrl = "";
+        String currentSearchTerm = (String) request.getSession(false).getAttribute("searchKeyword");
+        ResourceId videoId = new ResourceId();
+        SearchResultSnippet videoInfoSnippet = new SearchResultSnippet();
+        String videoTitle = "";
 
         // Check if the search term has programming in it (to filter out unrelated things)
-        System.out.println(currentSearchTerm);
         currentSearchTerm = currentSearchTerm.toLowerCase();
         boolean termFound = false;
         String [] terms = currentSearchTerm.split(" ");
@@ -126,50 +112,21 @@ public class YouTubeServlet extends HttpServlet{
         if (!termFound) {
           currentSearchTerm = currentSearchTerm + " programming";
         }
-
-        /* CHECKPOINT */
-        System.out.println("Previous Page Token: " + previousPageToken);
-        System.out.println("Current Page Token: " + nextPageToken);
         System.out.println("Previous Search: " + previousSearchTerm);
         System.out.println("Current Search: " + currentSearchTerm);
-        System.out.println("Number of Videos: " + results);
+        // Start Datastore Service
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        // Define and execute the API request
+        YouTube.Search.List api_request = youtubeService.search().list("snippet");
 
         // Check if we need to requery the same term
-        /* Reasons to requery:
-            - Term changed => currentPageToken is set to default
-            - Additional content wanted: needNextPageToken is true
-        */
-        if (currentSearchTerm.equals(previousSearchTerm) && !needNextPageToken) {
+        if (currentSearchTerm.equals(previousSearchTerm)) {
           System.out.println("Do not query again: YouTube Servlet");
         }
         else {
           System.out.println("Query again: YouTube Servlet");
           links.clear();
-          if (!needNextPageToken) { // If nextPageToken not needed, reset both the previous and next
-            System.out.println("Reset tokens");
-            previousPageToken = "";
-            nextPageToken = "";
-          }
         }
-
-        // Define and execute the API request
-        YouTube.Search.List api_request = youtubeService.search().list("snippet");
-        // Check if the next page token is needed
-        if (needNextPageToken) {
-          // Run an empty query: no videos that soul purpose is to get the next page token
-          SearchListResponse empty_query = api_request.setKey(DEVELOPER_KEY)
-            .setQ(currentSearchTerm) // Q term (Search Term)
-            .setOrder("relevance") // Relevant to Q term
-            .setMaxResults(results) // Number of Videos
-            .setType("video") // Specify we want videos, fixes issue of grabbing playlists
-            .setVideoDuration("medium") // Specify videos between 4 min and 20 mins
-            .setPageToken(previousPageToken)
-            .execute();
-
-          nextPageToken = empty_query.getNextPageToken();
-        }
-        System.out.println("Next Page Token: " + nextPageToken);
-
 
         if (links.size() == 0) { // Basically, will prevent duplicating the video links
           SearchListResponse api_response = api_request.setKey(DEVELOPER_KEY)
@@ -178,7 +135,6 @@ public class YouTubeServlet extends HttpServlet{
             .setMaxResults(results) // Number of Videos
             .setType("video") // Specify we want videos, fixes issue of grabbing playlists
             .setVideoDuration("medium") // Specify videos between 4 min and 20 mins
-            .setPageToken(nextPageToken)
             .execute();
           for (int i=0; i < (int) results; i++) {
             // Retrieve the video's id
@@ -192,20 +148,43 @@ public class YouTubeServlet extends HttpServlet{
 
             links.add(embedUrl);
             links.add(directUrl);
+
+            /* ---------- DATASTORE STORAGE ------------ */
+
+            // Prepare a new Entity
+            Entity video = new Entity("Video");
+            boolean inDatastore = false;
+            // Set title and url to properties
+            video.setProperty("Title", videoTitle);
+            video.setProperty("URL", directUrl);
+            video.setProperty("Search Term", currentSearchTerm);
+            // Put the entity into datastore
+            Query query = new Query("Video");
+            PreparedQuery queryResults = datastore.prepare(query);
+            if (queryResults.asIterable().iterator().hasNext()) {
+              for (Entity entity : queryResults.asIterable()) {
+                if (directUrl.equals((String) entity.getProperty("URL"))) {
+                  inDatastore = true;
+                }
+              }
+            }
+            if (!inDatastore) {
+              datastore.put(video);
+            }
           }
+          // Keep track of if the search term changes
+          previousSearchTerm = currentSearchTerm;
         }
       }
       catch (GeneralSecurityException e) {
         response.setContentType("text/html;");
         response.getWriter().println("Task Failed: Error Occurred");
-        response.getWriter().println();
-        response.getWriter().println("Location: YouTubeServlet doGet()");
+        response.setContentType("text/html;");
         response.getWriter().println();
         response.getWriter().println(e);
       }
       // Convert to JSON
       String json = convertToJson(links);
-      
       // Write JSON to page
       response.setContentType("text/html");
       response.getWriter().println(json);
@@ -220,22 +199,13 @@ public class YouTubeServlet extends HttpServlet{
       String info = "";
       try {
         info = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-        info = info.substring(1,info.length()-1);
-        System.out.println(info);
-        String [] arrayInfo = info.split(",");
-        previousSearchTerm = currentSearchTerm;
-        numVideos = Integer.parseInt(arrayInfo[0]);
-        needNextPageToken = Boolean.parseBoolean(arrayInfo[1]);
+        NUM_VIDEOS = Integer.parseInt(info);
+        
         response.setContentType("text/html");
         response.getWriter().println(true);
       } catch (Exception e) {
         response.getWriter().println(false);
-        response.setContentType("text/html;");
-        response.getWriter().println("Task Failed: Error Occurred");
-        response.getWriter().println();
-        response.getWriter().println("Location: YouTubeServlet doPost()");
-        response.getWriter().println();
-        response.getWriter().println(e);
+        System.out.println("Issue Found: " + e);
       }
     }
 
