@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var clicked = false;
+var videos = 5;
 
 var numVideos = 0;
 var resourceSearchTerm;
@@ -142,7 +144,7 @@ async function displayCalendarHandler() {
         displayCalendar(data.main, data.study, data.timezone);
     }
     catch (e) {
-        console.log("Calendar IDs fetch failed");
+        console.log("Calendar IDs fetch failed! " + e);
     }
 }
 
@@ -224,9 +226,10 @@ function setSearchInput(event) {
   const input = document.getElementsByName("keywords-input");
   if (event.keyCode === 13) {
     const searchTerm = event.target.value.replace(/\n/g, "").trim();
+    if (searchTerm === "") return;
     if (confirm("Are you sure you would like to generate a schedule for '" + searchTerm + "'?")) {
-      getResourcesForCalendar(searchTerm);
       input.value = ""; // User confirmed request. 
+      generateSchedule(searchTerm);
       console.log("Schedule Generated!");
     } else {
       input.value = searchTerm; // User canceled.
@@ -234,16 +237,24 @@ function setSearchInput(event) {
   }
 }
 
-// This function passes important information to ResourceServlets to get resources. Then simply calls ScheduleGeneration.
-async function getResourcesForCalendar(searchKeyword) {
+// This function passes important information to ResourceServlets to get resource information.
+async function generateSchedule(searchKeyword) {
   // Grab current Calendar settings relevant to generate the schedule
-  const response = await fetch(`/get-calendar-settings?searchKeyword=${searchKeyword}`);
+  var response = await fetch(`/get-calendar-settings?searchKeyword=${searchKeyword}`);
   const resourceInformation = await response.json();
 
-  // Grab number of videos
+  // Grab number of videos and set them
   const numberOfVideos = resourceInformation.numberOfVideos;
   numVideos = numberOfVideos;
   console.log(numberOfVideos);
+  getVideoResults();
+
+  // Get relevant video results.
+  document.getElementById("loader").style.visibility = "visible";
+  console.log("Waiting for schedule to finish!")
+  response = await fetch(`/schedule-handler?generate=true`);
+  console.log("Finished generating the schedule!");
+  document.getElementById("loader").style.visibility = "hidden";
 }
 
 // Fetch the Book resource data from BookServlet to post on Home page
@@ -299,10 +310,45 @@ function openResource(evt, pageName) {
   evt.currentTarget.className += " active";
 }
 
+async function setLearningLevel() {
+  const ele = document.getElementsByName("intensity"); 
+              
+  for (var i = 0; i < ele.length; i++) { 
+    if (ele[i].checked) {
+      const response = await fetch(`/updateLearningLevel?set=true&level=${ele[i].value}`);
+      const data = await response.json();
+    }
+  } 
+}
+
+async function getLearningLevel() {
+  const ele = document.getElementsByName("intensity"); 
+  const notes = document.getElementById("notes");
+  const response = await fetch(`/updateLearningLevel?set=false&setNotes=false&level=-1`);
+  const data = await response.json();
+
+  for (var i = 0; i < ele.length; i++) { 
+    if (ele[i].value === data.level) {
+      ele[i].checked = true;
+    }
+  } 
+  notes.value = data.notes;
+}
+
+async function setNotes() {
+  const notes = document.getElementById("notes");
+  const response = await fetch(`/updateLearningLevel?set=false&setNotes=true&notes=${notes.value}`);
+}
+
+function delay() {
+    var timer = null;
+    clearTimeout(timer); 
+    timer = setTimeout(setNotes, 1000)
+}
+
 // Jest Testing  in script.js file
 
 if (typeof exports !== undefined) {
   module.exports = {displayCalendarHandler, getCalendarSrcString, getSrcFirstString, 
                     getSrcMainCalString, getSrcStudyCalString, getSrcLastString, 
                     getResources, createHyperLink}
-}

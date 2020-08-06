@@ -164,3 +164,20 @@ ul.topnav li.right {float: right;}
   padding: 20px;
   grid-row-start: 2;
 }
+
+.loader {
+  visibility: hidden;
+  float: right;
+  margin-right: 4rem;
+  border: 7px solid #f3f3f3; /* Light grey */
+  border-top: 7px solid #85b98a;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
