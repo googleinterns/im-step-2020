@@ -37,7 +37,7 @@ form {
 /* Basic Settings */
 .basic {
   width: 50%;
-  color: #f1f1f1;
+  color: #161414;
   font-family: 'Roboto', sans-serif;
   font-weight:400;
 }
@@ -50,13 +50,18 @@ form {
 /* Advanced Settings */
 .advanced {
   width: 50%;
-  color: #f1f1f1;
+  color: #161414;
   font-family: 'Roboto', sans-serif;
   font-weight:400;
 }
 
 .advanced h2 {
   font-size: 5em;
+}
+
+/* Custom days */
+.CUSTOMDays {
+  display: none;
 }
 
 /* Bold statements will stand out on the page */
@@ -110,6 +115,7 @@ form .submit {
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
+  margin: 3em;
 }
 
 /* Submit button */
@@ -143,7 +149,7 @@ form .submit {
 	animation-name: fadeInOpacity;
 	animation-iteration-count: 1;
 	animation-timing-function: ease-in;
-	animation-duration: 1s;
+	animation-duration: 1.5s;
 }
 
 @keyframes fadeInOpacity {
