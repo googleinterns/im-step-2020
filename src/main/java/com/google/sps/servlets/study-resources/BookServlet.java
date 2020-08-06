@@ -100,7 +100,7 @@ public class BookServlet extends HttpServlet{
   }
 
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, GoogleJsonResponseException {
     try {
       Books bookService = getService();
       long results = 25;
@@ -122,14 +122,15 @@ public class BookServlet extends HttpServlet{
   
       // Retrieve title,id and build URL
       if (links.size() == 0) {
-        List api_request = bookService.volumes().list("items")
+        Volumes api_response = bookService.volumes().list("items")
         .setKey(DEVELOPER_KEY)
         .setQ(currentSearchTerm)
         .setOrderBy("relevance")
         .setPrintType("BOOKS")
-        .setMaxResults(results);
+        .setMaxResults(results)
+        .set("country", "US")
+        .execute();
         // Execute query
-        Volumes api_response = api_request.execute();
         for (int i = 0; i < (int) results; i++) {
           title = api_response.getItems().get(i).getVolumeInfo().getTitle();
           subtitle = api_response.getItems().get(i).getVolumeInfo().getSubtitle();
