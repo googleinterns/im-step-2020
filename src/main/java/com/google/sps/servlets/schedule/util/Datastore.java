@@ -54,7 +54,7 @@ public class Datastore {
                 "Need some motivation: https://medium.com/dev-genius/why-you-should-stop-watching-tutorials-and-reading-docs-escaping-tutorial-purgatory-2c6b438b418\n\n" +
                 "Looking for extra free material?: https://www.codecademy.com/\nhttps://www.khanacademy.org/\n\n" + 
                 "Eager to pay for material?: https://www.udemy.com/\n\n" +
-                "Interview Prep?: https://leetcode.com/problemset/all/\nhttps://www.algoexpert.io/product").toString());
+                "Interview Prep?: https://leetcode.com/problemset/all/").toString());
             
             // Possible study event session start times
             List<List<Integer>> STUDY_SESSION_START_TIME = new ArrayList<List<Integer>>();

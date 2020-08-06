@@ -7,13 +7,16 @@
         <title>Calendar Settings</title>
         <link rel="stylesheet" href="settings.css">
     </head>
-
-    <body>
-        <a href="/home.html">Go back</a>
-        <h1>Let's customize your schedule...</h1><hr>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <body onload="setStateOfSettings()">
+        <ul class="topnav">
+            <li><a href="/home.html">Home</a></li>
+            <li><a href="/guide.html">Guide</a></li>
+            <li><a class="active" href="#">Settings</a></li>
+            <li class="right"><a href="/feedback.html">Feedback</a></li>
+        </ul>
 
         <form class="form" action="/schedule-handler" method="GET" id="settings">
-            <input type="hidden" id="saveSettings" name="saveSettings" value="0">
 
             <div class="basic fade-in">
                 <h2>Basic Settings</h2>
@@ -23,10 +26,10 @@
                     <b>Sets start time:</b>
                     <br>
                     <label for="startDay">Start Day (from now): e.g. a value of '1' - start looking 1 day from today (tomorrow)</label>
-                    <input type="number" name="startDay" id="startDay" value="1" min="0" max="6" placeholder="0-1"><br><br>
+                    <input type="number" name="startDay" id="startDay" value="1" min="0" max="6" placeholder="0-6" required><br><br>
 
                     <label for="startWeek">Start Week (from now): e.g. a value of '2' - start looking 2 weeks from today</label>
-                    <input type="number" name="startWeek" id="startWeek" value="0" min="0" max="12" placeholder="e.g. 1 to start next week"><br>
+                    <input type="number" name="startWeek" id="startWeek" value="0" min="0" max="6" placeholder="0-6" required><br><br>
                     <i>**Example: Start Day: 2 | Start Week: 1 == Start trying to place events 1 week from 2 days from now. **</i>
                 </div>
                 <br>
@@ -56,14 +59,30 @@
                 <!-- On Days -->
                 <b>Choose 1 of the following:</b>
                 <br>
-                <input type="radio" id="weekDay" name="days" value="0" required checked>
+                <input type="radio" id="none" name="days" value="0" required checked onchange="customDays()">
+                <label for="none">Study Sessions on ANY DAY</label><br>
+
+                <input type="radio" id="weekDay" name="days" value="1" onchange="customDays()">
                 <label for="weekDay">Study Sessions ONLY on Weekday</label><br>
 
-                <input type="radio" id="weekEnd" name="days" value="1">
+                <input type="radio" id="weekEnd" name="days" value="2" onchange="customDays()">
                 <label for="weekEnd">Study Sessions ONLY on Weekends</label><br>
 
-                <input type="radio" id="custom" name="days" value="2">
-                <label for="custom">Custom Days</label><br>
+                <input type="radio" id="custom" name="days" value="3" onchange="customDays()">
+                <label for="custom">Custom Days</label><br><br>
+
+                <div class="CUSTOMDays" id="CUSTOMDays">
+                    <label for="cd">Choose your study session days:</label>
+                    <select id="cd" name="cd" size="7" multiple>
+                        <option value="sunday">Sunday</option>
+                        <option value="monday">Monday</option>
+                        <option value="tuesday">Tuesday</option>
+                        <option value="wednesday">Wednesday</option>
+                        <option value="thursday">Thursday</option>
+                        <option value="friday">Friday</option>
+                        <option value="saturday">Saturday</option><br>
+                    </select>
+                </div>
             </div>
 
             <br><br>
@@ -73,22 +92,26 @@
 
                 
                 <!-- Possible start times -->
-                <b>NOTE: (leftmost values will be prioritized first). Must include 0 for any value. e.g. 0hr 30min</b>
+                <b>NOTE: Must include 0 for any value. e.g. 0hr 30min</b>
                 <br><br>
-                <label for="times">Enter possible start times: (leftmost prioritized first). Must include 0 for any value.</label><br><br>
-                <input type="text" id="times" name="times" minlength="0" size="50" value="9:00Am, 12:00pm, 7:00PM, 4:00Pm" required><br><br><br>
+                <label for="times">Enter possible start times: Must include 0 for any value.</label><br><br>
+                <input type="text" id="times" name="times" minlength="0" size="50" value="9:00Am, 12:00pm, 7:00PM, 4:00Pm" placeholder="9:00am, 12:00pm, 7:00PM, 4:00Pm" required><br><br><br>
 
                 <!-- Possible durations -->
                 <label for="durations">Enter possible durations for each study session: (leftmost prioritized first). Must include 0 for any value.</label><br><br>
-                <input type="text" id="durations" name="durations" minlength="0" size="50" value="1hr 15min, 1 hour 0min, 0hr 30min" required><br><br><br>
+                <input type="text" id="durations" name="durations" minlength="0" size="50" value="1hr 15min, 1 hour 0min, 0hr 30min" placeholder="1hr 15min, 1 hour 0min, 0hr 30min" required><br><br><br>
 
                 <!-- Event Look Span -->
-                <label for="span">Span of time where we will try to set recurring events (in days): e.g. a value of '7' - means try to place recurring events within the next 7 days </label><br><br>
-                <input type="number" name="span" id="span" value="7" min="1" max="25" placeholder="1-25"><br><br><br>
+                <label for="span">Span of time where we will try to set recurring events (in days): e.g. a value of '7' - Place recurring events within the next 7 days </label><br><br>
+                <input type="number" name="span" id="span" value="7" min="1" max="10" placeholder="1-10" required><br><br><br>
 
                 <!-- Event Recurrence Length -->
-                <label for="recurrenceLength">How many weeks will this event occur (weekly): e.g. a value of '4' - means you will have events weekly for up to 4 weeks. </label><br><br>
-                <input type="number" name="recurrenceLength" id="recurrenceLength" value="4" min="1" max="25" placeholder="1-25"><br>
+                <label for="recurrenceLength">How many weeks will this event occur (weekly): e.g. a value of '4' - Weekly events up to 4 weeks </label><br><br>
+                <input type="number" name="recurrenceLength" id="recurrenceLength" value="4" min="1" max="10" placeholder="1-10" required><br><br><br>
+
+                <!-- Overlapping events -->
+                <label for="overlapping">Delete overlapping events?</label>
+                <input type="checkbox" name="overlapping" id="overlapping" value="true">
             </div>
 
 

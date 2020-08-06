@@ -40,17 +40,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 
-/** Servlet that gets Calendar settings. */
-/** ReadUserSettingsFromDBServlet simply reads from 
- * To display calendar settings we need AT LEAST 2 pieces of information 
- * 1) a calendar ID 2) timezone. This will be displayed using an iFrame.
- * 
- * As of now, we display the user's primary_idcalendar and the study schedule ID.
- * 
- * We check if we have a calendar already on saved on the Servlet session, then we just send that one
- * Else we check if the user has a Study Schedule on their list of calendars. Then we send that one
- * Else we return an error that there is no calendar to display.
- */
 @WebServlet("/getSettingsState")
 public class ReadUserSettingsFromDBServlet extends HttpServlet {
   private Datastore DB = new Datastore();
@@ -69,13 +58,6 @@ public class ReadUserSettingsFromDBServlet extends HttpServlet {
   }};
 
   @Override
-  /** doGet
-   * 
-   * The fields are as follows: 
-   * 
-   * @param request 
-   * @return response JSON object consisting of fields required to display the object
-   */
   public void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws IOException {
 
@@ -95,14 +77,6 @@ public class ReadUserSettingsFromDBServlet extends HttpServlet {
     if (DB.getUser(primary_id) == null) {
       response.sendRedirect("/home.html");
       return;
-    }
-
-    try {
-      String defaults = request.getParameter("defaults");
-      Boolean getDefaults = Boolean.valueOf(defaults);
-      if (getDefaults) DB.applyDefaults(primary_id);
-    } catch (Exception e) {
-      System.out.println(e);
     }
 
     getSettingsFromDB(primary_id, response);
@@ -128,7 +102,7 @@ public class ReadUserSettingsFromDBServlet extends HttpServlet {
       try {
         response.getWriter().print(sendJSON);
       } catch (Exception err) {
-        System.out.println(err);
+        System.out.println("Error when sending error message trying to read from DB: " + err);
       }
     }
   }
