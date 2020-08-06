@@ -29,6 +29,11 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 @WebServlet("/bookQuery")
 public class BookServlet extends HttpServlet{
 
@@ -36,7 +41,7 @@ public class BookServlet extends HttpServlet{
   private static final String APPLICATION_NAME = "First Time Coders";
   private static String previousSearchTerm = "";
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-  private ArrayList<String> links = new ArrayList<String>();
+  private JSONArray links = new JSONArray();
 
   public void init() {
     try {
@@ -64,21 +69,46 @@ public class BookServlet extends HttpServlet{
             .build();
   }
 
+  public static String checkForBackSlash(String title) {
+    int index = title.indexOf("\\");
+    if (index != -1) {
+      String before = title.substring(0, index);
+      String after = title.substring(index+1);
+      return before + after;
+    }
+    else {
+      return title;
+    }
+  }
+
   public static String makeURL(String title, String id) {
     // https://www.google.com/books/edition/[TITLE]/[ID]
-    return "https://www.google.com/books/edition/" + title + "/" + id;
-    
+    String bookTitle = title.replaceAll(" ", "_");
+    if (bookTitle.contains("/")) {
+      bookTitle = bookTitle.replaceAll("/","_");
+    }
+    return "https://www.google.com/books/edition/" + bookTitle + "/" + id;
+  }
+
+  public static String makeFullTitle(String title, String subtitle) {
+    if (subtitle != null && !subtitle.contains("\\")) {
+      return title + " " + subtitle;
+    }
+    else {
+      return title;
+    }
   }
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     try {
-
       Books bookService = getService();
       long results = 25;
       String currentSearchTerm = (String) request.getSession(false).getAttribute("searchKeyword");
       currentSearchTerm = currentSearchTerm.toLowerCase();
       String title = "";
+      String subtitle = "";
+      String fullTitle = "";
       String id = "";
       String url = "";
       
@@ -87,7 +117,7 @@ public class BookServlet extends HttpServlet{
         System.out.println("Do not query again: Books Servlet");
       } else {
         System.out.println("Query again: Books Servlet");
-        links.clear();
+        links = new JSONArray();
       }
   
       // Retrieve title,id and build URL
@@ -102,16 +132,22 @@ public class BookServlet extends HttpServlet{
         Volumes api_response = api_request.execute();
         for (int i = 0; i < (int) results; i++) {
           title = api_response.getItems().get(i).getVolumeInfo().getTitle();
+          subtitle = api_response.getItems().get(i).getVolumeInfo().getSubtitle();
+          title = checkForBackSlash(title);
+          fullTitle = makeFullTitle(title, subtitle);
           id = api_response.getItems().get(i).getId();
           url = makeURL(title, id);
-          links.add(url);
+          JSONObject json = new JSONObject();
+          json.put("Title", fullTitle);
+          json.put("URL", url);
+          links.add(json);
         }
         previousSearchTerm = currentSearchTerm;
       }
-      String json = convertToJson(links);
+     
 
       response.setContentType("text/html;");
-      response.getWriter().println(json);
+      response.getWriter().println(links);
     }
     catch (GeneralSecurityException e) {
       response.setContentType("text/html;");
@@ -120,11 +156,5 @@ public class BookServlet extends HttpServlet{
       response.getWriter().println();
       response.getWriter().println(e);
     }
-  }
-
-  private String convertToJson(ArrayList<String> array) {
-    Gson gson = new Gson();
-    String json = gson.toJson(array);
-    return json;
   }
 }

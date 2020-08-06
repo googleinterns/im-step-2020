@@ -10,7 +10,7 @@
     </head>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Roboto&display=swap" rel="stylesheet">
     <body>
-        <body onload="displayCalendarHandler(); getResources();">
+        <body onload="displayCalendarHandler(); ">
 
         <ul class="topnav">
             <li><a class="active" href="#">Home</a></li>
@@ -58,7 +58,7 @@
                 </div>
                 <div class="key-display">
                     <h2>"I will learn..."</h2>
-                    <input onkeyup="setSearchInput(event);" class="keywords-input" type="search" name="keywords-input" placeholder="Python">
+                    <input onkeyup="setSearchInput(event); waitUntilScheduleGenerates();" class="keywords-input" type="search" name="keywords-input" placeholder="Python">
                     <br>
                 </div>
                 <div class="learner-display">
