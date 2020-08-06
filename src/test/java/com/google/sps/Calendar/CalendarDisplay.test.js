@@ -12,34 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-/*  Examples
-
-const getAboutUsLink = require("./index");
-test("Returns about-us for english language", () => {
-    expect(getAboutUsLink("en-US")).toBe("/about-us");
-});
-
-
-const FUNCTIONNAMEthatwewanttoimport = require("./script");
-test("Description/Name of the test", () => {
-    expect(FUNCTIONNAME("parameter")).toBe("return value");
-});
-
-test("Description/Name of the test", () => {
-    var param = "";
-    var expected = "";
-    expect(functions.name(param)).toBe(expected);
-});
-
-if (typeof exports !== undefined) {
-  module.exports = {displayCalendarHandler, getCalendarSrcString, getSrcFirstString, 
-                    getSrcMainCalString, getSrcStudyCalString, getSrcLastString, 
-                    getResources, createHyperLink}
-}
-
-*/
-
 const functions = require("///home/maricarol/im-step-2020/src/main/webapp/script.js");
 
 test("Returns complete calendar src link needed to build calendar iframe", () => {
